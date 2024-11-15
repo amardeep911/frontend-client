@@ -1,10 +1,11 @@
-A;
 import AppLayout from "./../components/layout/AppLayout";
 import { Icon } from "@/components/ui/Icons";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { AuthContext } from "@/utils/AppContext";
 import toast from "react-hot-toast";
+import { useContext } from "react";
 
 const Home = ({ serviceData }) => {
   const [searchQuery, setSearchQuery] = useState("");
