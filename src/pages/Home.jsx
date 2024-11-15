@@ -32,7 +32,11 @@ const Home = ({ serviceData }) => {
       const getNumberRequest = async () => {
         try {
           // Construct the URL with all required parameters
-          const url = `/get-number?api_key=${apiKey}&servicecode=${serviceCode}&server=${serverNumber}`;
+          //maintain whitespace in server name
+
+          const url = `/get-number?api_key=${apiKey}&code=${serviceCode}&server=${serverNumber}&serverName=${encodeURIComponent(
+            selectedService.name
+          )}`;
           console.log("Request URL:", url);
 
           await axios.get(url); // API Call
