@@ -128,7 +128,7 @@ const Home = ({ serviceData }) => {
                     <h3 className="capitalize font-medium text-start">
                       {service.name}
                     </h3>
-                    <div className="flex items-center">
+                    {/* <div className="flex items-center">
                       <p className="text-base">
                         {formatPrice(
                           service.servers
@@ -141,7 +141,7 @@ const Home = ({ serviceData }) => {
                         )}
                       </p>
                       <Icon.indianRupee className="w-4 h-4" />
-                    </div>
+                    </div> */}
                   </button>
                 ))
               ) : (
