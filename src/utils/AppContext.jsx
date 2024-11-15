@@ -30,7 +30,7 @@ export function AuthProvider({ children }) {
   const fetchUserData = async (userId) => {
     try {
       const apiKeyResponse = await axios.get(`/api_key?userId=${userId}`);
-      console.log(apiKeyResponse.data);
+
       const newApiKey = apiKeyResponse.data.api_key;
       setApiKey(newApiKey);
       fetchBalance(newApiKey);
@@ -60,7 +60,6 @@ export function AuthProvider({ children }) {
         }
       );
       setServiceData(response.data);
-      console.log(response.data);
     } catch (error) {
       console.log(error.response.data.error);
     } finally {
@@ -112,7 +111,6 @@ export function AuthProvider({ children }) {
     fetchServiceData(); // Fetch data for logged-out user
   };
 
-  console.log(serviceData);
   return (
     <AuthContext.Provider
       value={{

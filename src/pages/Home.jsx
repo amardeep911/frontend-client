@@ -1,10 +1,10 @@
 import AppLayout from "./../components/layout/AppLayout";
 import { Icon } from "@/components/ui/Icons";
-import axios from "axios";
-import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { AuthContext } from "@/utils/AppContext";
+import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import axios from "axios";
+import { AuthContext } from "../utils/AppContext"; // Correct import without curly braces
 import { useContext } from "react";
 
 const Home = ({ serviceData }) => {
@@ -13,51 +13,32 @@ const Home = ({ serviceData }) => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { user, apiKey, fetchBalance } = useContext(AuthContext);
-
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value.toLowerCase());
     setSelectedService(null);
   };
 
   const handleServiceClick = (service) => {
-    setSearchQuery(service.name);
     setSelectedService(service);
   };
 
-  const getFilteredServices = () => {
-    if (!searchQuery) {
-      return serviceData;
-    }
+  const handleServerClick = async (serverNumber, serviceCode) => {
+    console.log("Server:", serverNumber, "Service Code:", serviceCode);
+    if (loading) return;
 
-    return serviceData.filter((service) =>
-      service.name.toLowerCase().includes(searchQuery)
-    );
-  };
-
-  const filteredServices = getFilteredServices();
-
-  const clearSearch = () => {
-    setSearchQuery("");
-    setSelectedService(null);
-  };
-
-  const handleServiceButtonClick = async (serverNumber) => {
-    if (!user) {
-      navigate("/login");
-      return;
-    }
-    const service = selectedService;
     setLoading(true);
+
     const getNumberPromise = new Promise((resolve, reject) => {
       const getNumberRequest = async () => {
         try {
-          await axios.get(
-            `/get-number?api_key=${apiKey}&servicecode=${service.servicecode}&server=${serverNumber}`
-          );
+          // Construct the URL with all required parameters
+          const url = `/get-number?api_key=${apiKey}&servicecode=${serviceCode}&server=${serverNumber}`;
+          console.log("Request URL:", url);
+
+          await axios.get(url); // API Call
           resolve(); // Resolve the promise on success
         } catch (error) {
-          // Reject the promise on error
-          reject(error);
+          reject(error); // Reject the promise on error
         } finally {
           setLoading(false);
         }
@@ -65,11 +46,11 @@ const Home = ({ serviceData }) => {
 
       getNumberRequest();
     });
+
     await toast.promise(getNumberPromise, {
       loading: "Processing Request...",
       success: () => {
-        fetchBalance(apiKey);
-        navigate("/my-orders"); // Redirect on success
+        navigate("/my-orders");
         return "Number Bought Successfully!";
       },
       error: (error) => {
@@ -79,43 +60,21 @@ const Home = ({ serviceData }) => {
     });
   };
 
-  const anyOtherService = serviceData.find(
-    (service) => service.name.toLowerCase() === "any other"
-  );
-
-  // Helper function to format the price
-  // Helper function to format the price
-  const formatPrice = (price) => {
-    if (!price) {
-      return "0";
+  const getFilteredServices = () => {
+    if (!searchQuery) {
+      return serviceData;
     }
-
-    const [integerPart, decimalPart] = price.split(".");
-    const formattedInteger = integerPart.padStart(2, "0");
-    const formattedPrice = `${formattedInteger}.${decimalPart || "00"}`;
-    return formattedPrice;
+    return serviceData.filter((service) =>
+      service.name.toLowerCase().includes(searchQuery)
+    );
   };
 
-  const server5SingleOtp = {
-    1: "anyother",
-    2: "bajajfinserv",
-    3: "bumble",
-    4: "burgerking",
-    5: "chalkboard",
-    6: "citaprevia",
-    7: "gmail",
-    8: "hepsiburadacom",
-    9: "hermes",
-    10: "humblebundle",
-    11: "myglo",
-    12: "parlayplay",
-    13: "paysafecard",
-    14: "samsung",
-    15: "sixer",
-    16: "tantan",
-    17: "telegram",
-    18: "wechat",
-    19: "winzogame",
+  const filteredServices = getFilteredServices();
+
+  const formatPrice = (price) => {
+    if (!price) return "0.00";
+    const [integerPart, decimalPart] = price.split(".");
+    return `${integerPart.padStart(2, "0")}.${decimalPart || "00"}`;
   };
 
   return (
@@ -131,55 +90,27 @@ const Home = ({ serviceData }) => {
               onChange={handleSearchChange}
               className="w-full h-[50px] ml-2 bg-transparent border-0 text-base text-white placeholder:text-primary focus:outline-none"
             />
-            {searchQuery !== "" ? (
-              <Icon.circleX
-                className="text-primary cursor-pointer"
-                onClick={clearSearch}
-              />
-            ) : (
-              ""
-            )}
           </div>
           <div className="flex flex-col w-full h-[450px] md:h-[340px]">
             <h5 className="p-3">
-              {selectedService ? "Select Server" : "Services"}
+              {selectedService ? "Servers for Selected Service" : "Services"}
             </h5>
             <div className="rounded-2xl flex flex-col overflow-y-auto hide-scrollbar h-full">
               {selectedService ? (
-                selectedService.servers.map((server) => (
+                selectedService.servers.map((server, index) => (
                   <button
                     className="bg-[#282828] py-4 px-3 md:px-5 flex mb-1 w-full items-center justify-between rounded-lg"
-                    key={server._id}
-                    disabled={loading}
+                    key={index}
                     onClick={() =>
-                      handleServiceButtonClick(server.serverNumber)
+                      handleServerClick(server.server, server.code)
                     }
+                    disabled={loading}
                   >
                     <h3 className="capitalize font-medium flex flex-col items-start">
-                      Server {server.serverNumber}
-                      {server.serverNumber === 4 && (
-                        <span className="text-sm text-gray-400">
-                          (single otp)
-                        </span>
-                      )}
-                      {server.serverNumber === 5 &&
-                        Object.values(server5SingleOtp).includes(
-                          selectedService.servicecode.toLowerCase()
-                        ) && (
-                          <span className="text-sm text-gray-400">
-                            (single otp)
-                          </span>
-                        )}
-                      {server.serverNumber === 7 && (
-                        <span className="text-sm text-gray-400">
-                          (single otp)
-                        </span>
-                      )}
-                      {server.serverNumber === 9 && (
-                        <span className="text-sm text-gray-400">
-                          (single otp & fresh number)
-                        </span>
-                      )}
+                      Server {server.server}
+                      <span className="text-sm text-gray-400">
+                        {server.otp}
+                      </span>
                     </h3>
                     <div className="flex items-center">
                       <p className="text-base">{formatPrice(server.price)}</p>
@@ -188,36 +119,33 @@ const Home = ({ serviceData }) => {
                   </button>
                 ))
               ) : filteredServices.length > 0 ? (
-                filteredServices.map((i) => (
+                filteredServices.map((service, index) => (
                   <button
                     className="bg-[#282828] py-4 px-3 md:px-5 flex mb-1 w-full items-center justify-between rounded-lg"
-                    key={i.name}
-                    onClick={() => handleServiceClick(i)}
+                    key={index}
+                    onClick={() => handleServiceClick(service)}
                   >
                     <h3 className="capitalize font-medium text-start">
-                      {i.name}
+                      {service.name}
                     </h3>
                     <div className="flex items-center">
-                      <p className="text-base">{formatPrice(i.lowestPrice)}</p>
+                      <p className="text-base">
+                        {formatPrice(
+                          service.servers
+                            .reduce(
+                              (min, s) =>
+                                Math.min(min, parseFloat(s.price || "0")),
+                              Infinity
+                            )
+                            .toFixed(2)
+                        )}
+                      </p>
                       <Icon.indianRupee className="w-4 h-4" />
                     </div>
                   </button>
                 ))
               ) : (
-                <button
-                  className="bg-[#282828] py-4 px-3 md:px-5 flex mb-1 w-full items-center justify-between rounded-lg"
-                  onClick={() => handleServiceClick(anyOtherService)}
-                >
-                  <h3 className="capitalize font-medium">
-                    {anyOtherService.name}
-                  </h3>
-                  <div className="flex items-center">
-                    <p className="text-base">
-                      {formatPrice(anyOtherService.lowestPrice)}
-                    </p>
-                    <Icon.indianRupee className="w-4 h-4" />
-                  </div>
-                </button>
+                <div className="text-white">No services found</div>
               )}
             </div>
           </div>
