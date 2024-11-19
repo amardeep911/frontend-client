@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import axios from "axios";
-import { AuthContext } from "../utils/AppContext"; // Correct import without curly braces
+import { AuthContext } from "../utils/AppContext";
 import { useContext } from "react";
 
 const Home = ({ serviceData }) => {
@@ -13,6 +13,7 @@ const Home = ({ serviceData }) => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { user, apiKey, fetchBalance } = useContext(AuthContext);
+
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value.toLowerCase());
     setSelectedService(null);
@@ -22,8 +23,15 @@ const Home = ({ serviceData }) => {
     setSelectedService(service);
   };
 
-  const handleServerClick = async (serverNumber, serviceCode) => {
-    console.log("Server:", serverNumber, "Service Code:", serviceCode);
+  const handleServerClick = async (serverNumber, serviceCode, isMultiple) => {
+    console.log(
+      "Server:",
+      serverNumber,
+      "Service Code:",
+      serviceCode,
+      "isMultiple:",
+      isMultiple
+    );
     if (loading) return;
 
     setLoading(true);
@@ -32,9 +40,7 @@ const Home = ({ serviceData }) => {
       const getNumberRequest = async () => {
         try {
           // Construct the URL with all required parameters
-          //maintain whitespace in server name
-
-          const url = `/get-number?api_key=${apiKey}&code=${serviceCode}&server=${serverNumber}&serverName=${encodeURIComponent(
+          const url = `/get-number?api_key=${apiKey}&code=${serviceCode}&server=${serverNumber}&isMultiple=${isMultiple}&serverName=${encodeURIComponent(
             selectedService.name
           )}`;
           console.log("Request URL:", url);
@@ -106,7 +112,11 @@ const Home = ({ serviceData }) => {
                     className="bg-[#282828] py-4 px-3 md:px-5 flex mb-1 w-full items-center justify-between rounded-lg"
                     key={index}
                     onClick={() =>
-                      handleServerClick(server.server, server.code)
+                      handleServerClick(
+                        server.server,
+                        server.code,
+                        server.otp === "Multiple Otp" // Determine if it's multiple
+                      )
                     }
                     disabled={loading}
                   >
@@ -132,20 +142,6 @@ const Home = ({ serviceData }) => {
                     <h3 className="capitalize font-medium text-start">
                       {service.name}
                     </h3>
-                    {/* <div className="flex items-center">
-                      <p className="text-base">
-                        {formatPrice(
-                          service.servers
-                            .reduce(
-                              (min, s) =>
-                                Math.min(min, parseFloat(s.price || "0")),
-                              Infinity
-                            )
-                            .toFixed(2)
-                        )}
-                      </p>
-                      <Icon.indianRupee className="w-4 h-4" />
-                    </div> */}
                   </button>
                 ))
               ) : (

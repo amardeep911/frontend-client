@@ -300,7 +300,7 @@ const SignUp = () => {
                 <ReCAPTCHA
                   theme="dark"
                   className="scale-[0.85] md:transform-none"
-                  sitekey="6LeAfAoqAAAAAPKwGgbxZpBXsBZ4hZ1iazAvta6e"
+                  sitekey="6LfDoLEpAAAAAI3LGKc65_BVrEF6FnLgby2uNFv-"
                   onChange={(value) => setCaptchaValue(value)}
                 />
               </div>
