@@ -196,19 +196,36 @@ const GetNumber = () => {
     try {
       for (const order of orders) {
         const { server, numberId } = order;
-        await axios.get(
-          `/get-otp?api_key=${apiKey}&server=${server}&id=${numberId}`
+        console.log(order);
+        // Make the request to fetch OTP
+        const response = await axios.get(
+          `/get-otp?api_key=${apiKey}&server=${server}&id=${numberId}&serviceName=${order.service}`
         );
 
+        // Update transactions with the new data
         const transactionsResponse = await axios.get(
           `/transaction-history?userId=${user.userId}`
         );
         setTransactions(transactionsResponse.data);
       }
+
       setOtpError(false); // Reset error state on success
     } catch (error) {
       console.error("Error fetching OTP", error);
-      setOtpError(true); // Set error state on failure
+
+      if (error.response?.status === 404) {
+        // Stop polling if it's a 404 error
+        console.error("Stopping polling due to 404 Not Found error");
+        setOtpError(true);
+      } else {
+        // For other errors, continue polling and show the error message
+        const errorMessage =
+          error.response?.data?.error || "An error occurred. Retrying...";
+        setTransactions((prevTransactions) => [
+          ...prevTransactions,
+          { id: "Error", otp: errorMessage }, // Append the error message as a new "transaction"
+        ]);
+      }
     }
   };
 
