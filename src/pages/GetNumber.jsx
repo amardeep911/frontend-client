@@ -27,6 +27,8 @@ const GetNumber = () => {
         axios.get(`/transaction-history?userId=${user.userId}`),
       ]);
 
+      // console.log(transactionsResponse.data);
+
       setOrders(ordersResponse.data);
       setTransactions(transactionsResponse.data);
       setLoading(false);
@@ -53,11 +55,12 @@ const GetNumber = () => {
 
     const otpList = relatedTransactions
       .map((transaction) => transaction.otp)
-      .filter((otp) => otp !== null);
+
+      .filter((otp) => otp !== "" && otp !== "STATUS_WAIT_CODE");
+    console.log(otpList);
 
     return otpList.length > 0 ? otpList : ["Waiting for SMS"];
   };
-
   const calculateRemainingTime = (expirationTime) => {
     const now = new Date();
     const timeDifference = new Date(expirationTime) - now;
@@ -196,7 +199,7 @@ const GetNumber = () => {
     try {
       for (const order of orders) {
         const { server, numberId } = order;
-        console.log(order);
+        // console.log(order);
         // Make the request to fetch OTP
         const response = await axios.get(
           `/get-otp?api_key=${apiKey}&server=${server}&id=${numberId}&serviceName=${order.service}`
@@ -217,15 +220,8 @@ const GetNumber = () => {
         // Stop polling if it's a 404 error
         console.error("Stopping polling due to 404 Not Found error");
         setOtpError(true);
-      } else {
-        // For other errors, continue polling and show the error message
-        const errorMessage =
-          error.response?.data?.error || "An error occurred. Retrying...";
-        setTransactions((prevTransactions) => [
-          ...prevTransactions,
-          { id: "Error", otp: errorMessage }, // Append the error message as a new "transaction"
-        ]);
       }
+      // Do nothing for other errors (continue polling)
     }
   };
 
@@ -245,7 +241,8 @@ const GetNumber = () => {
     setPopoverStates((prev) => ({ ...prev, [orderId]: true }));
     navigator.clipboard.writeText(number);
   };
-
+  // console.log(orders);
+  console.log(transactions);
   return (
     <div className="h-[calc(100dvh-4rem)] overflow-y-auto hide-scrollbar">
       {loading ? (
@@ -333,6 +330,7 @@ const GetNumber = () => {
                     )}
                   </div>
                 </div>
+
                 <div className="w-full flex rounded-2xl items-center justify-center mb-2">
                   <div className="bg-transparent pt-4 flex w-full items-center justify-center gap-4">
                     <Button
