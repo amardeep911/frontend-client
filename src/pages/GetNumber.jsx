@@ -257,6 +257,7 @@ const GetNumber = () => {
         </div>
       ) : (
         orders.map((order) => {
+          console.log(order);
           const hasOtp = getOTPFromTransaction(order.numberId).some(
             (otp) => otp !== "Waiting for SMS"
           );

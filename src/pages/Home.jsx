@@ -1,11 +1,10 @@
+import React, { useState, useContext } from "react";
 import AppLayout from "./../components/layout/AppLayout";
 import { Icon } from "@/components/ui/Icons";
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import axios from "axios";
 import { AuthContext } from "../utils/AppContext";
-import { useContext } from "react";
 
 const Home = ({ serviceData }) => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -23,15 +22,12 @@ const Home = ({ serviceData }) => {
     setSelectedService(service);
   };
 
+  const clearSearch = () => {
+    setSearchQuery("");
+    setSelectedService(null);
+  };
+
   const handleServerClick = async (serverNumber, serviceCode, isMultiple) => {
-    console.log(
-      "Server:",
-      serverNumber,
-      "Service Code:",
-      serviceCode,
-      "isMultiple:",
-      isMultiple
-    );
     if (loading) return;
 
     setLoading(true);
@@ -39,7 +35,6 @@ const Home = ({ serviceData }) => {
     const getNumberPromise = new Promise((resolve, reject) => {
       const getNumberRequest = async () => {
         try {
-          // Construct the URL with all required parameters
           const url = `/get-number?api_key=${apiKey}&code=${serviceCode}&server=${serverNumber}&isMultiple=${isMultiple}&serverName=${encodeURIComponent(
             selectedService.name
           )}`;
@@ -100,6 +95,12 @@ const Home = ({ serviceData }) => {
               onChange={handleSearchChange}
               className="w-full h-[50px] ml-2 bg-transparent border-0 text-base text-white placeholder:text-primary focus:outline-none"
             />
+            {searchQuery !== "" && (
+              <Icon.circleX
+                className="text-primary cursor-pointer"
+                onClick={clearSearch}
+              />
+            )}
           </div>
           <div className="flex flex-col w-full h-[450px] md:h-[340px]">
             <h5 className="p-3">
@@ -107,33 +108,31 @@ const Home = ({ serviceData }) => {
             </h5>
             <div className="rounded-2xl flex flex-col overflow-y-auto hide-scrollbar h-full">
               {selectedService ? (
-                selectedService.servers
-                  .sort((a, b) => a.server - b.server) // Sort by server number
-                  .map((server, index) => (
-                    <button
-                      className="bg-[#282828] py-4 px-3 md:px-5 flex mb-1 w-full items-center justify-between rounded-lg"
-                      key={index}
-                      onClick={() =>
-                        handleServerClick(
-                          server.server,
-                          server.code,
-                          server.otp === "Multiple Otp" // Determine if it's multiple
-                        )
-                      }
-                      disabled={loading}
-                    >
-                      <h3 className="capitalize font-medium flex flex-col items-start">
-                        Server {server.server}
-                        <span className="text-sm text-gray-400">
-                          {server.otp}
-                        </span>
-                      </h3>
-                      <div className="flex items-center">
-                        <p className="text-base">{formatPrice(server.price)}</p>
-                        <Icon.indianRupee className="w-4 h-4" />
-                      </div>
-                    </button>
-                  ))
+                selectedService.servers.map((server, index) => (
+                  <button
+                    className="bg-[#282828] py-4 px-3 md:px-5 flex mb-1 w-full items-center justify-between rounded-lg"
+                    key={index}
+                    onClick={() =>
+                      handleServerClick(
+                        server.server,
+                        server.code,
+                        server.otp === "Multiple Otp"
+                      )
+                    }
+                    disabled={loading}
+                  >
+                    <h3 className="capitalize font-medium flex flex-col items-start">
+                      Server {server.server}
+                      <span className="text-sm text-gray-400">
+                        {server.otp}
+                      </span>
+                    </h3>
+                    <div className="flex items-center">
+                      <p className="text-base">{formatPrice(server.price)}</p>
+                      <Icon.indianRupee className="w-4 h-4" />
+                    </div>
+                  </button>
+                ))
               ) : filteredServices.length > 0 ? (
                 filteredServices.map((service, index) => (
                   <button
