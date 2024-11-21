@@ -108,31 +108,33 @@ const Home = ({ serviceData }) => {
             </h5>
             <div className="rounded-2xl flex flex-col overflow-y-auto hide-scrollbar h-full">
               {selectedService ? (
-                selectedService.servers.map((server, index) => (
-                  <button
-                    className="bg-[#282828] py-4 px-3 md:px-5 flex mb-1 w-full items-center justify-between rounded-lg"
-                    key={index}
-                    onClick={() =>
-                      handleServerClick(
-                        server.server,
-                        server.code,
-                        server.otp === "Multiple Otp"
-                      )
-                    }
-                    disabled={loading}
-                  >
-                    <h3 className="capitalize font-medium flex flex-col items-start">
-                      Server {server.server}
-                      <span className="text-sm text-gray-400">
-                        {server.otp}
-                      </span>
-                    </h3>
-                    <div className="flex items-center">
-                      <p className="text-base">{formatPrice(server.price)}</p>
-                      <Icon.indianRupee className="w-4 h-4" />
-                    </div>
-                  </button>
-                ))
+                selectedService.servers
+                  .sort((a, b) => parseInt(a.server) - parseInt(b.server)) // Sort servers by server number
+                  .map((server, index) => (
+                    <button
+                      className="bg-[#282828] py-4 px-3 md:px-5 flex mb-1 w-full items-center justify-between rounded-lg"
+                      key={index}
+                      onClick={() =>
+                        handleServerClick(
+                          server.server,
+                          server.code,
+                          server.otp === "Multiple Otp"
+                        )
+                      }
+                      disabled={loading}
+                    >
+                      <h3 className="capitalize font-medium flex flex-col items-start">
+                        Server {server.server}
+                        <span className="text-sm text-gray-400">
+                          {server.otp}
+                        </span>
+                      </h3>
+                      <div className="flex items-center">
+                        <p className="text-base">{formatPrice(server.price)}</p>
+                        <Icon.indianRupee className="w-4 h-4" />
+                      </div>
+                    </button>
+                  ))
               ) : filteredServices.length > 0 ? (
                 filteredServices.map((service, index) => (
                   <button
