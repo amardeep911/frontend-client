@@ -117,15 +117,27 @@ const GetNumber = () => {
     await fetchBalance(apiKey);
   };
 
-  const handleOrderCancel = async (orderId, numberId, server, hasOtp) => {
+  const handleOrderCancel = async (
+    orderId,
+    numberId,
+    server,
+    hasOtp,
+    userId
+  ) => {
     setLoadingCancel((prev) => ({ ...prev, [orderId]: true }));
 
     const orderCancelPromise = new Promise((resolve, reject) => {
       const orderCancelRequest = async () => {
         try {
-          await axios.get(
-            `/number-cancel?api_key=${apiKey}&id=${numberId}&server=${server}`
-          );
+          if (hasOtp) {
+            // Call `/api/cancel-order` when the button text is "Finish"
+            await axios.post(`/cancel-order?userId=${userId}&id=${numberId}`);
+          } else {
+            // Default cancel behavior
+            await axios.get(
+              `/number-cancel?api_key=${apiKey}&id=${numberId}&server=${server}`
+            );
+          }
           resolve();
         } catch (error) {
           reject(error);
@@ -199,18 +211,22 @@ const GetNumber = () => {
     try {
       for (const order of orders) {
         const { server, numberId } = order;
-        // console.log(order);
-        // Make the request to fetch OTP
-        const response = await axios.get(
+        // Fetch OTP for each order
+        await axios.get(
           `/get-otp?api_key=${apiKey}&server=${server}&id=${numberId}&serviceName=${order.service}`
         );
-
-        // Update transactions with the new data
-        const transactionsResponse = await axios.get(
-          `/transaction-history?userId=${user.userId}`
-        );
-        setTransactions(transactionsResponse.data);
       }
+
+      // Fetch updated transactions and orders after processing OTPs
+      const [updatedOrdersResponse, updatedTransactionsResponse] =
+        await Promise.all([
+          axios.get(`/orders?userId=${user.userId}`),
+          axios.get(`/transaction-history?userId=${user.userId}`),
+        ]);
+
+      // Update state with the latest data
+      setOrders(updatedOrdersResponse.data);
+      setTransactions(updatedTransactionsResponse.data);
 
       setOtpError(false); // Reset error state on success
     } catch (error) {
@@ -321,7 +337,11 @@ const GetNumber = () => {
                       (otp, index, arr) => (
                         <React.Fragment key={index}>
                           <div className="bg-transparent py-4 px-5 flex w-full items-center justify-center">
-                            <h3 className="font-normal text-sm">{otp}</h3>
+                            <h3 className="font-normal text-sm">
+                              {otp === "STATUS_CANCEL"
+                                ? "ACTIVATION EXPIRED"
+                                : otp}
+                            </h3>
                           </div>
                           {index < arr.length - 1 && (
                             <hr className="border-[#888888] border w-full" />
@@ -341,7 +361,8 @@ const GetNumber = () => {
                           order._id,
                           order.numberId,
                           order.server,
-                          hasOtp
+                          hasOtp,
+                          order.userId
                         )
                       }
                       isLoading={loadingCancel[order._id]}
