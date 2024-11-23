@@ -66,12 +66,22 @@ const Home = ({ serviceData }) => {
   };
 
   const getFilteredServices = () => {
-    if (!searchQuery) {
-      return serviceData;
-    }
-    return serviceData.filter((service) =>
+    let filteredServices = serviceData.filter((service) =>
       service.name.toLowerCase().includes(searchQuery)
     );
+
+    // Fallback to "Any Other" if no matches
+    if (filteredServices.length === 0) {
+      const anyOtherService = serviceData.find(
+        (service) => service.name.toLowerCase() === "any other"
+      );
+
+      if (anyOtherService) {
+        filteredServices = [anyOtherService];
+      }
+    }
+
+    return filteredServices;
   };
 
   const filteredServices = getFilteredServices();
