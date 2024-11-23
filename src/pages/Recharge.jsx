@@ -25,6 +25,8 @@ const Recharge = () => {
   const [isloading, setIsloading] = useState(false);
   const { user, fetchBalance, apiKey } = useContext(AuthContext);
   const [QRImage, setQRImage] = useState(null);
+  const [open, setOpen] = useState(false);
+  console.log("User:", user);
 
   const fetchExchangeRate = async () => {
     try {

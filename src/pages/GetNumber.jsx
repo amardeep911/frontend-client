@@ -180,13 +180,12 @@ const GetNumber = () => {
             `/get-number?api_key=${apiKey}&servicecode=${servicecode}&server=${server}`
           );
 
-          await fetchOrdersAndTransactions();
-
+          await fetchOrdersAndTransactions(); // Fetch updated orders
           resolve();
         } catch (error) {
           reject(error);
         } finally {
-          fetchBalance(apiKey);
+          await fetchBalance(apiKey); // Trigger balance update
           setLoadingBuyAgain((prev) => ({ ...prev, [orderId]: false }));
         }
       };
@@ -196,11 +195,11 @@ const GetNumber = () => {
 
     await toast.promise(buyAgainPromise, {
       loading: "Buying Again...",
-      success: () => {
+      success: async () => {
+        await fetchBalance(apiKey); // Trigger balance update again just in case
         return "Number bought again successfully!";
       },
       error: (error) => {
-        console.error("Error buying the number again", error);
         const errorMessage = error.response?.data?.error || "Please try again.";
         return errorMessage;
       },

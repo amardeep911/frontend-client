@@ -36,6 +36,8 @@ const CheckOtp = () => {
     }
   };
 
+  console.log(otpText);
+
   return (
     <div className="h-[calc(100dvh-4rem)] flex flex-col items-center justify-center">
       <Card className="bg-[#121315] w-full max-w-md p-4 rounded-lg border-none dark">
@@ -81,12 +83,12 @@ const CheckOtp = () => {
                 key={index}
                 className="bg-[#282828] py-4 px-3 md:px-5 flex mb-1 w-full items-center justify-between rounded-lg"
               >
-                <h3 className="capitalize font-medium flex flex-col items-start">
-                  {name}
-                </h3>
                 <div className="flex items-center">
                   <p className="text-base">Server 1</p>
                 </div>
+                <h3 className="capitalize font-medium flex flex-col items-start">
+                  {name}
+                </h3>
               </div>
             ))
           )}
