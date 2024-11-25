@@ -5,6 +5,7 @@ import { LayoutLoader } from "@/components/layout/Loaders";
 import axios from "axios";
 import { AuthContext } from "./utils/AppContext";
 import HomeWrapper from "@/components/layout/HomeWrapper";
+import { useEffect } from "react";
 
 const Login = lazy(() => import("@/pages/Login"));
 const SignUp = lazy(() => import("@/pages/SignUp"));
@@ -25,18 +26,19 @@ function App() {
   const { user, isGoogleLogin } = useContext(AuthContext);
 
   // Mock maintenance check by setting isMaintenance to false
-  const [isMaintenance] = useState(false);
+  const [isMaintenance, setIsMaintenance] = useState(false);
+  const [maintainance, setMaintainance] = useState(false);
 
   // Commented out the actual maintenance check for now
-  // const fetchMaintenance = async () => {
-  //   const response = await axios.get("/maintainance-check");
-  //   setMaintainance(response.data.maintainance);
-  //   setIsMaintenance(response.data.maintainance);
-  // };
+  const fetchMaintenance = async () => {
+    const response = await axios.get("/maintainance-check");
+    setMaintainance(response.data.maintainance);
+    setIsMaintenance(response.data.maintainance);
+  };
 
-  // useEffect(() => {
-  //   fetchMaintenance();
-  // }, []);
+  useEffect(() => {
+    fetchMaintenance();
+  }, []);
 
   return (
     <BrowserRouter>
