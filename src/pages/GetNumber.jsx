@@ -12,7 +12,7 @@ const GetNumber = () => {
   const [orders, setOrders] = useState([]);
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { user, apiKey, fetchBalance } = useContext(AuthContext);
+  const { user, apiKey, fetchBalance, serviceData } = useContext(AuthContext);
   const [buttonStates, setButtonStates] = useState({});
   const [otpError, setOtpError] = useState(false);
   const [loadingCancel, setLoadingCancel] = useState({});
@@ -166,18 +166,46 @@ const GetNumber = () => {
     });
   };
 
-  const handleBuyAgain = async (server, service, orderId) => {
-    const servicecode = service
-      .toLowerCase()
-      .replace(/\s+/g, "")
-      .replace(/[^a-z0-9]/g, "");
+  const handleBuyAgain = async (order) => {
+    console.log(serviceData);
+    console.log(order);
 
-    setLoadingBuyAgain((prev) => ({ ...prev, [orderId]: true }));
+    // Extract the service data for the corresponding order's service
+    const service = serviceData.find((item) => item.name === order.service);
+
+    if (!service) {
+      console.error(`Service ${order.service} not found in serviceData`);
+      return;
+    }
+
+    // Find the server details within the service's servers array
+    const serverDetails = service.servers.find(
+      (server) => server.server === order.server.toString()
+    );
+
+    if (!serverDetails) {
+      console.error(
+        `Server ${order.server} not found for service ${order.service}`
+      );
+      return;
+    }
+
+    // Determine if the order should have isMultiple set to true or false
+    const isMultiple = serverDetails.otp === "Multiple Otp";
+
+    console.log(`isMultiple: ${isMultiple}`);
+
+    // Proceed with the buy again process
+    setLoadingBuyAgain((prev) => ({ ...prev, [order._id]: true }));
     const buyAgainPromise = new Promise((resolve, reject) => {
       const buyAgainRequest = async () => {
         try {
           await axios.get(
-            `/get-number?api_key=${apiKey}&servicecode=${servicecode}&server=${server}`
+            `/get-number?api_key=${apiKey}&code=${serverDetails.code}&server=${
+              order.server
+            }&isMultiple=${isMultiple}&serverName=${encodeURIComponent(
+              service.name
+            )}`
           );
 
           await fetchOrdersAndTransactions(); // Fetch updated orders
@@ -186,7 +214,7 @@ const GetNumber = () => {
           reject(error);
         } finally {
           await fetchBalance(apiKey); // Trigger balance update
-          setLoadingBuyAgain((prev) => ({ ...prev, [orderId]: false }));
+          setLoadingBuyAgain((prev) => ({ ...prev, [order._id]: false }));
         }
       };
 
@@ -195,14 +223,8 @@ const GetNumber = () => {
 
     await toast.promise(buyAgainPromise, {
       loading: "Buying Again...",
-      success: async () => {
-        await fetchBalance(apiKey); // Trigger balance update again just in case
-        return "Number bought again successfully!";
-      },
-      error: (error) => {
-        const errorMessage = error.response?.data?.error || "Please try again.";
-        return errorMessage;
-      },
+      success: "Number bought again successfully!",
+      error: "Error buying the number again. Please try again.",
     });
   };
 
@@ -374,9 +396,7 @@ const GetNumber = () => {
                     </Button>
                     <Button
                       className="py-2 px-6 rounded-full border-2 border-primary font-normal bg-transparent text-primary hover:bg-primary hover:text-white transition-colors duration-200 ease-in-out"
-                      onClick={() =>
-                        handleBuyAgain(order.server, order.service, order._id)
-                      }
+                      onClick={() => handleBuyAgain(order)}
                       isLoading={loadingBuyAgain[order._id]}
                     >
                       Buy Again
