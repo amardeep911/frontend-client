@@ -41,6 +41,7 @@ const Home = ({ serviceData }) => {
           console.log("Request URL:", url);
 
           await axios.get(url); // API Call
+          await fetchBalance(apiKey);
           resolve(); // Resolve the promise on success
         } catch (error) {
           reject(error); // Reject the promise on error
