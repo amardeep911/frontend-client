@@ -90,7 +90,7 @@ const GetNumber = () => {
                 [orderId]: true,
               }));
               handleOrderExpire(orderId);
-            } else if (newRemainingTime.split(":")[0] <= "18") {
+            } else if (newRemainingTime.split(":")[0] <= "17") {
               setButtonStates((prevStates) => ({
                 ...prevStates,
                 [orderId]: true,
