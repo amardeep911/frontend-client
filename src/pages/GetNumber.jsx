@@ -61,12 +61,17 @@ const GetNumber = () => {
 
     return otpList.length > 0 ? otpList : ["Waiting for SMS"];
   };
-  const calculateRemainingTime = (orderTime) => {
+  const calculateRemainingTime = (server, orderTime) => {
     const now = new Date();
-    const orderTimePlus20Min = new Date(
-      new Date(orderTime).getTime() + 20 * 60000
-    );
-    const timeDifference = orderTimePlus20Min - now;
+    let orderTimePlus;
+
+    if (server == 7) {
+      orderTimePlus = new Date(new Date(orderTime).getTime() + 10 * 60000);
+    } else {
+      orderTimePlus = new Date(new Date(orderTime).getTime() + 20 * 60000);
+    }
+
+    const timeDifference = orderTimePlus - now;
     if (timeDifference <= 0) return "00:00";
 
     const minutes = Math.floor(timeDifference / 60000);
@@ -77,14 +82,15 @@ const GetNumber = () => {
     }${seconds}`;
   };
 
-  const Countdown = ({ orderTime, orderId }) => {
+  const Countdown = ({ server, orderTime, orderId }) => {
     const [remainingTime, setRemainingTime] = useState(() =>
-      calculateRemainingTime(orderTime)
+      calculateRemainingTime(server, orderTime)
     );
 
     useEffect(() => {
       const updateRemainingTime = () => {
-        const newRemainingTime = calculateRemainingTime(orderTime);
+        const newRemainingTime = calculateRemainingTime(server, orderTime);
+        const threshold = server === 7 ? "07" : "17";
         setRemainingTime((prevTime) => {
           if (prevTime !== newRemainingTime) {
             if (newRemainingTime === "00:00") {
@@ -93,7 +99,7 @@ const GetNumber = () => {
                 [orderId]: true,
               }));
               handleOrderExpire(orderId);
-            } else if (newRemainingTime.split(":")[0] <= "17") {
+            } else if (newRemainingTime.split(":")[0] <= threshold) {
               setButtonStates((prevStates) => ({
                 ...prevStates,
                 [orderId]: true,
@@ -110,9 +116,9 @@ const GetNumber = () => {
 
       return () => clearInterval(interval);
     }, [orderTime, orderId]);
-
     return <span className="font-mono">{remainingTime}</span>;
   };
+
   const handleOrderExpire = async (orderId) => {
     setOrders((prevOrders) =>
       prevOrders.filter((order) => order._id !== orderId)
@@ -350,6 +356,7 @@ const GetNumber = () => {
                   <div className="bg-transparent max-w-56 py-4 px-5 flex w-full items-center justify-between rounded-lg">
                     <p className="font-normal">Remaining Time</p>
                     <Countdown
+                      server={order.server}
                       orderTime={order.orderTime}
                       orderId={order._id}
                     />
