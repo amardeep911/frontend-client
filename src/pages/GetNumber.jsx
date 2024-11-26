@@ -61,9 +61,12 @@ const GetNumber = () => {
 
     return otpList.length > 0 ? otpList : ["Waiting for SMS"];
   };
-  const calculateRemainingTime = (expirationTime) => {
+  const calculateRemainingTime = (orderTime) => {
     const now = new Date();
-    const timeDifference = new Date(expirationTime) - now;
+    const orderTimePlus20Min = new Date(
+      new Date(orderTime).getTime() + 20 * 60000
+    );
+    const timeDifference = orderTimePlus20Min - now;
     if (timeDifference <= 0) return "00:00";
 
     const minutes = Math.floor(timeDifference / 60000);
@@ -74,14 +77,14 @@ const GetNumber = () => {
     }${seconds}`;
   };
 
-  const Countdown = ({ expirationTime, orderId }) => {
+  const Countdown = ({ orderTime, orderId }) => {
     const [remainingTime, setRemainingTime] = useState(() =>
-      calculateRemainingTime(expirationTime)
+      calculateRemainingTime(orderTime)
     );
 
     useEffect(() => {
       const updateRemainingTime = () => {
-        const newRemainingTime = calculateRemainingTime(expirationTime);
+        const newRemainingTime = calculateRemainingTime(orderTime);
         setRemainingTime((prevTime) => {
           if (prevTime !== newRemainingTime) {
             if (newRemainingTime === "00:00") {
@@ -106,7 +109,7 @@ const GetNumber = () => {
       const interval = setInterval(updateRemainingTime, 1000);
 
       return () => clearInterval(interval);
-    }, [expirationTime, orderId]);
+    }, [orderTime, orderId]);
 
     return <span className="font-mono">{remainingTime}</span>;
   };
@@ -347,7 +350,7 @@ const GetNumber = () => {
                   <div className="bg-transparent max-w-56 py-4 px-5 flex w-full items-center justify-between rounded-lg">
                     <p className="font-normal">Remaining Time</p>
                     <Countdown
-                      expirationTime={order.expirationTime}
+                      orderTime={order.orderTime}
                       orderId={order._id}
                     />
                   </div>
