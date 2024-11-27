@@ -288,8 +288,6 @@ const GetNumber = () => {
     setPopoverStates((prev) => ({ ...prev, [orderId]: true }));
     navigator.clipboard.writeText(number);
   };
-  // console.log(orders);
-  console.log(transactions);
   return (
     <div className="h-[calc(100dvh-4rem)] overflow-y-auto hide-scrollbar">
       {loading ? (
@@ -305,7 +303,7 @@ const GetNumber = () => {
       ) : (
         orders.map((order) => {
           console.log(order);
-          const hasOtp = getOTPFromTransaction(order.numberId).some(
+          const hasOtp = getTransaction(order.numberId).some(
             (otp) => otp !== "Waiting for SMS"
           );
 
@@ -365,20 +363,35 @@ const GetNumber = () => {
                 </div>
                 <div className="w-full flex bg-[#444444] border-2 border-[#888888] rounded-2xl items-center justify-center max-h-[100px] overflow-y-scroll overflow-hidden ">
                   <div className="w-full h-full flex flex-col items-center">
-                    {
-                    const Transactions = getTransaction(order.numberId);
-                    (
-                      (otp, index, arr) => (
-                        <React.Fragment key={index}>
+                    {getTransaction(order.numberId).map((transaction) => (
+                      <React.Fragment key={transaction.id}>
+                        {transaction.status === "PENDING" &&
+                        transaction.otp.length === 0 ? (
                           <div className="bg-transparent py-4 px-5 flex w-full items-center justify-center">
-                            <h3 className="font-normal text-sm">{otp}</h3>
+                            <h3 className="font-normal text-sm">
+                              Waiting For Sms
+                            </h3>
                           </div>
-                          {index < arr.length - 1 && (
-                            <hr className="border-[#888888] border w-full" />
-                          )}
-                        </React.Fragment>
-                      )
-                    )}
+                        ) : transaction.status === "CANCELLED" ? (
+                          <div className="bg-transparent py-4 px-5 flex w-full items-center justify-center">
+                            <h3 className="font-normal text-sm">
+                              ACTIVATION EXPIRED
+                            </h3>
+                          </div>
+                        ) : transaction.otp.length > 0 ? (
+                          transaction.otp.map((otp, index, arr) => (
+                            <React.Fragment key={index}>
+                              <div className="bg-transparent py-4 px-5 flex w-full items-center justify-center">
+                                <h3 className="font-normal text-sm">{otp}</h3>
+                              </div>
+                              {index < arr.length - 1 && (
+                                <hr className="border-[#888888] border w-full" />
+                              )}
+                            </React.Fragment>
+                          ))
+                        ) : null}
+                      </React.Fragment>
+                    ))}
                   </div>
                 </div>
 
