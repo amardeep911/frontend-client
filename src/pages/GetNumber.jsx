@@ -44,6 +44,14 @@ const GetNumber = () => {
     }
   }, [user]);
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchBalance(apiKey); // Call the fetchBalance function
+    }, 2000); // 2 seconds
+
+    return () => clearInterval(interval); // Cleanup on component unmount
+  }, [apiKey, fetchBalance]);
+
   const getOTPFromTransaction = (numberId) => {
     const relatedTransactions = transactions.filter(
       (transaction) => transaction.id === numberId
@@ -151,7 +159,7 @@ const GetNumber = () => {
         } catch (error) {
           reject(error);
         } finally {
-          fetchBalance(apiKey);
+          // await fetchBalance(apiKey);
           handleOrderExpire(orderId);
           setLoadingCancel((prev) => ({ ...prev, [orderId]: false }));
         }
