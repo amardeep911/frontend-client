@@ -59,7 +59,7 @@ const GetNumber = () => {
     const relatedTransaction = transactions.filter(
       (transaction) => transaction.id === numberId
     );
-
+    console.log(relatedTransaction);
     return relatedTransaction;
   };
   const calculateRemainingTime = (server, orderTime) => {
@@ -304,7 +304,8 @@ const GetNumber = () => {
         orders.map((order) => {
           console.log(order);
           const hasOtp = getTransaction(order.numberId).some(
-            (otp) => otp !== "Waiting for SMS"
+            (transaction) =>
+              Array.isArray(transaction.otp) && transaction.otp.length > 0
           );
 
           return (
@@ -414,6 +415,7 @@ const GetNumber = () => {
                         (!buttonStates[order._id] && !hasOtp)
                       }
                     >
+                      {console.log(hasOtp)}
                       {hasOtp ? "Finish" : "Cancel"}
                     </Button>
                     <Button
