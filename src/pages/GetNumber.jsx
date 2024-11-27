@@ -38,6 +38,9 @@ const GetNumber = () => {
     }
   };
 
+  console.log(orders);
+  console.log(transactions);
+
   useEffect(() => {
     if (user) {
       fetchOrdersAndTransactions();
@@ -52,22 +55,12 @@ const GetNumber = () => {
     return () => clearInterval(interval); // Cleanup on component unmount
   }, [apiKey, fetchBalance]);
 
-  const getOTPFromTransaction = (numberId) => {
-    const relatedTransactions = transactions.filter(
+  const getTransaction = (numberId) => {
+    const relatedTransaction = transactions.filter(
       (transaction) => transaction.id === numberId
     );
 
-    if (relatedTransactions.length === 0) {
-      return ["Waiting for SMS"];
-    }
-
-    const otpList = relatedTransactions
-      .map((transaction) => transaction.otp)
-
-      .filter((otp) => otp !== "" && otp !== "STATUS_WAIT_CODE");
-    console.log(otpList);
-
-    return otpList.length > 0 ? otpList : ["Waiting for SMS"];
+    return relatedTransaction;
   };
   const calculateRemainingTime = (server, orderTime) => {
     const now = new Date();
@@ -372,15 +365,13 @@ const GetNumber = () => {
                 </div>
                 <div className="w-full flex bg-[#444444] border-2 border-[#888888] rounded-2xl items-center justify-center max-h-[100px] overflow-y-scroll overflow-hidden ">
                   <div className="w-full h-full flex flex-col items-center">
-                    {getOTPFromTransaction(order.numberId).map(
+                    {
+                    const Transactions = getTransaction(order.numberId);
+                    (
                       (otp, index, arr) => (
                         <React.Fragment key={index}>
                           <div className="bg-transparent py-4 px-5 flex w-full items-center justify-center">
-                            <h3 className="font-normal text-sm">
-                              {otp === "STATUS_CANCEL"
-                                ? "ACTIVATION EXPIRED"
-                                : otp}
-                            </h3>
+                            <h3 className="font-normal text-sm">{otp}</h3>
                           </div>
                           {index < arr.length - 1 && (
                             <hr className="border-[#888888] border w-full" />
