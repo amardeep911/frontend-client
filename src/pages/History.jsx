@@ -60,6 +60,7 @@ const History = () => {
       return [];
     }
 
+    // Group data by `id` (transaction ID)
     const groupedData = data.reduce((acc, entry) => {
       if (!acc[entry.id]) {
         acc[entry.id] = [];
@@ -68,7 +69,9 @@ const History = () => {
       return acc;
     }, {});
 
+    // Prepare data for display
     const preparedData = Object.values(groupedData).map((entries) => {
+      // Find entries with specific statuses
       const finishedEntries = entries.filter(
         (entry) => entry.status === "FINISHED"
       );
@@ -76,25 +79,25 @@ const History = () => {
         (entry) => entry.status === "CANCELLED"
       );
 
+      // Determine which entry to display
       const displayEntry =
         cancelledEntries.length > 0
           ? cancelledEntries[0]
-          : finishedEntries.find((entry) => entry.otp !== null) ||
-            finishedEntries[0];
+          : finishedEntries.find((entry) => entry.otp.length > 0) || entries[0]; // Use the first entry as fallback
 
       return {
         ...displayEntry,
         otps:
-          finishedEntries
-            .filter((entry) => entry.otp)
-            .map((entry) => entry.otp)
-            .join(`<br><br>`) || "-",
+          displayEntry.otp.length > 0
+            ? displayEntry.otp.join("<br><br>") // Join OTPs with line breaks
+            : "-", // Display "-" if no OTPs are present
       };
     });
 
     return preparedData;
   };
 
+  // Apply filters for status
   let filteredTransactionHistory = filterTransactionHistory(transactionHistory);
 
   if (tranFilter === "Success") {
@@ -106,6 +109,12 @@ const History = () => {
       (entry) => entry.status === "CANCELLED"
     );
   }
+
+  const statusMap = {
+    CANCELLED: "REFUNDED",
+    FINISHED: "FINISHED",
+    PENDING: "PENDING",
+  };
 
   // Sort transactions by date and time
   const sortedFilteredTransactionHistory = filteredTransactionHistory
@@ -374,20 +383,18 @@ const NumberTable = ({ data, currentPage, limit }) => {
               <td className="p-2 font-normal text-sm">{entry.number}</td>
               <td
                 className="p-2 font-normal text-sm max-w-[400px]"
-                style={wrapStyle}
+                style={{ wordBreak: "break-word", whiteSpace: "normal" }}
               >
                 <span dangerouslySetInnerHTML={{ __html: entry.otps }} />
               </td>
               <td className="p-2 font-normal text-sm">
-                {moment(entry.date_time, "MM/DD/YYYYTHH:mm:ss A").format(
-                  "DD/MM/YYYY hh:mm:ss A"
-                )}
+                {moment(entry.date_time).format("DD/MM/YYYY hh:mm:ss A")}
               </td>
               <td className="p-2 font-normal text-sm">{entry.service}</td>
               <td className="p-2 font-normal text-sm">{entry.server}</td>
               <td className="p-2 font-normal text-sm">{entry.price}</td>
               <td className="p-2 font-normal text-sm text-teal-400">
-                {statusMap[entry.status] || ""}
+                {statusMap[entry.status] || entry.status}
               </td>
             </tr>
           ))}
