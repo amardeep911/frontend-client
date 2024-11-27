@@ -370,7 +370,7 @@ const GetNumber = () => {
                     />
                   </div>
                 </div>
-                <div className="w-full flex bg-[#444444] border-2 border-[#888888] rounded-2xl items-center justify-center max-h-[100px] overflow-y-scroll ">
+                <div className="w-full flex bg-[#444444] border-2 border-[#888888] rounded-2xl items-center justify-center max-h-[100px] overflow-y-scroll overflow-hidden ">
                   <div className="w-full h-full flex flex-col items-center">
                     {getOTPFromTransaction(order.numberId).map(
                       (otp, index, arr) => (
