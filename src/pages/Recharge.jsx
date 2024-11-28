@@ -52,10 +52,9 @@ const Recharge = ({ maintenanceStatusTrx, maintenanceStatusUpi }) => {
 
   const fetchQrImage = async () => {
     try {
-      const response = await axios.get("/get-qr", {
-        responseType: "blob",
-      });
-      const imageUrl = URL.createObjectURL(response.data);
+      const response = await axios.get(`/get-qr?amt=${amount.value}`);
+      const imageUrl = response.data.url;
+      console.log(imageUrl);
       setQRImage(imageUrl);
     } catch (error) {
       console.error("Error fetching QR code:", error);
@@ -72,6 +71,7 @@ const Recharge = ({ maintenanceStatusTrx, maintenanceStatusUpi }) => {
   }, [maintenanceStatusUpi]);
 
   useEffect(() => {
+    console.log("sdjfsfjsljflsj");
     fetchQrImage();
     fetchExchangeRate();
   }, [transactionOk, trxTransactionOk]);
