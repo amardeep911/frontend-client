@@ -26,10 +26,11 @@ import {
 
 const Recharge = ({ maintenanceStatusTrx, maintenanceStatusUpi }) => {
   const [isUpi, setIsUpi] = useState(true);
-  const amount = useInputValidation("", amountValidator);
+
   const trxamount = useInputValidation("", trxAmountValidator);
   const trxTransactionId = useInputValidation("");
   const [transactionOk, setTransactionOk] = useState(false);
+  const [minimumAmount, setMinimumAmount] = useState(50);
   const [trxTransactionOk, setTrxTransactionOk] = useState(false);
   const transactionId = useInputValidation("");
   const [exchangeRate, setExchangeRate] = useState("");
@@ -39,6 +40,26 @@ const Recharge = ({ maintenanceStatusTrx, maintenanceStatusUpi }) => {
   const [confirmDialog, setConfirmDialog] = useState(true);
   const [open, setOpen] = useState(false);
   console.log("User:", user);
+
+  const amount = useInputValidation("", (value) =>
+    amountValidator(value, minimumAmount)
+  );
+
+  // Fetch the minimum recharge amount
+  useEffect(() => {
+    const fetchMinimumAmount = async () => {
+      try {
+        const response = await axios.get("/get-minimum-recharge");
+        const data = response.data;
+        setMinimumAmount(data.minimumRecharge || 50); // Default to 50 if not found
+      } catch (error) {
+        console.error("Error fetching minimum amount:", error);
+        setMinimumAmount(50); // Default to 50 on error
+      }
+    };
+
+    fetchMinimumAmount();
+  }, []);
 
   const fetchExchangeRate = async () => {
     try {
@@ -52,9 +73,10 @@ const Recharge = ({ maintenanceStatusTrx, maintenanceStatusUpi }) => {
 
   const fetchQrImage = async () => {
     try {
-      const response = await axios.get(`/get-qr?amt=${amount.value}`);
-      const imageUrl = response.data.url;
-      console.log(imageUrl);
+      const response = await axios.get("/get-qr", {
+        responseType: "blob",
+      });
+      const imageUrl = URL.createObjectURL(response.data);
       setQRImage(imageUrl);
     } catch (error) {
       console.error("Error fetching QR code:", error);
@@ -71,7 +93,6 @@ const Recharge = ({ maintenanceStatusTrx, maintenanceStatusUpi }) => {
   }, [maintenanceStatusUpi]);
 
   useEffect(() => {
-    console.log("sdjfsfjsljflsj");
     fetchQrImage();
     fetchExchangeRate();
   }, [transactionOk, trxTransactionOk]);
@@ -288,7 +309,7 @@ const Recharge = ({ maintenanceStatusTrx, maintenanceStatusUpi }) => {
                   <Input
                     id="amount"
                     type="number"
-                    placeholder="Minimum 50.."
+                    placeholder={`Minimum ₹${minimumAmount}`}
                     className="w-full h-12 pl-3 rounded-lg no-arrows text-[#9d9d9d] !placeholder-[#9d9d9d] bg-transparent border-[#e0effe] focus:border-none"
                     required
                     value={amount.value}
@@ -477,7 +498,7 @@ const Recharge = ({ maintenanceStatusTrx, maintenanceStatusUpi }) => {
             <AlertDialogHeader>
               <AlertDialogTitle></AlertDialogTitle>
               <AlertDialogDescription className="text-white">
-                Minimum amount is 50₹, Otherwise no refund.
+                Minimum amount is ₹{minimumAmount}, Otherwise no refund.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>

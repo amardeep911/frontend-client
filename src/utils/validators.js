@@ -30,9 +30,13 @@ export const confirmPasswordValidator = (confirmPassword, password) => {
   return { isValid: true, errorMessage: "" };
 };
 
-export const amountValidator = (amount) => {
-  if (!amount || amount < 50) {
-    return { isValid: false, errorMessage: "Minimum amount is 50\u20B9" };
+// Pass minimum amount dynamically
+export const amountValidator = (amount, minimumAmount = 50) => {
+  if (!amount || amount < minimumAmount) {
+    return {
+      isValid: false,
+      errorMessage: `Minimum amount is ₹${minimumAmount}`,
+    };
   }
   return { isValid: true, errorMessage: "" };
 };
