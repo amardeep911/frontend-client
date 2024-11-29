@@ -73,10 +73,8 @@ const Recharge = ({ maintenanceStatusTrx, maintenanceStatusUpi }) => {
 
   const fetchQrImage = async () => {
     try {
-      const response = await axios.get("/get-qr", {
-        responseType: "blob",
-      });
-      const imageUrl = URL.createObjectURL(response.data);
+      const response = await axios.get(`/get-qr?amt=${amount.value}`);
+      const imageUrl = response.data.url;
       setQRImage(imageUrl);
     } catch (error) {
       console.error("Error fetching QR code:", error);
