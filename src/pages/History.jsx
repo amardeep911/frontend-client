@@ -71,9 +71,10 @@ const History = () => {
 
     // Prepare data for display
     const preparedData = Object.values(groupedData).map((entries) => {
+      console.log(entries.map((entry) => entry.status));
       // Find entries with specific statuses
       const finishedEntries = entries.filter(
-        (entry) => entry.status === "FINISHED"
+        (entry) => entry.status === "SUCCESS"
       );
       const cancelledEntries = entries.filter(
         (entry) => entry.status === "CANCELLED"
@@ -102,7 +103,7 @@ const History = () => {
 
   if (tranFilter === "Success") {
     filteredTransactionHistory = filteredTransactionHistory.filter(
-      (entry) => entry.status === "FINISHED"
+      (entry) => entry.status === "SUCCESS"
     );
   } else if (tranFilter === "Cancelled") {
     filteredTransactionHistory = filteredTransactionHistory.filter(
@@ -196,6 +197,7 @@ const History = () => {
     return `${minDate.format("DD/MM/YY")} - ${maxDate.format("DD/MM/YY")}`;
   };
 
+  console.log(transactionData);
   return (
     <div>
       <div className="bg-[#121315] h-[calc(100dvh-6rem)] flex flex-col overflow-y-auto w-full p-4 md:p-6 rounded-lg mb-[30px] border-none dark relative">
@@ -349,7 +351,7 @@ const History = () => {
 };
 const statusMap = {
   CANCELLED: "REFUNDED",
-  FINISHED: "FINISHED",
+  SUCCESS: "SUCESS",
 };
 const wrapStyle = {
   wordBreak: "break-word",

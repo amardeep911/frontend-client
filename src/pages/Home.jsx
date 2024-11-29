@@ -49,7 +49,6 @@ const Home = ({ serviceData }) => {
           setLoading(false);
         }
       };
-
       getNumberRequest();
     });
 
