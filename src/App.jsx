@@ -21,7 +21,7 @@ const About = lazy(() => import("@/pages/About"));
 const CheckOtp = lazy(() => import("@/pages/CheckOtp"));
 
 function App() {
-  axios.defaults.baseURL = "http://159.65.157.86:8000/api";
+  axios.defaults.baseURL = "https://159.65.157.86:8000/api";
   axios.defaults.withCredentials = true;
   const { user, isGoogleLogin } = useContext(AuthContext);
 
