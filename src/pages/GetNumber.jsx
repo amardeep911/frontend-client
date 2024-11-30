@@ -14,7 +14,7 @@ const GetNumber = () => {
   const [orders, setOrders] = useState([]);
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { user, apiKey, fetchBalance } = useContext(AuthContext);
+  const { user, apiKey, fetchBalance, serviceData } = useContext(AuthContext);
   const [buttonStates, setButtonStates] = useState({});
   const [otpError, setOtpError] = useState(false);
   const [loadingCancel, setLoadingCancel] = useState({});
