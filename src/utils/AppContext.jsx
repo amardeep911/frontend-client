@@ -53,15 +53,22 @@ export function AuthProvider({ children }) {
   const fetchServiceData = async (userId) => {
     try {
       setLoadingServiceData(true);
+
       const response = await axios.get(
         `/get-service-data${userId ? `?userId=${userId}` : ""}`,
         {
           withCredentials: true,
         }
       );
-      setServiceData(response.data);
+
+      // Deduplicate the service data based on a unique property (e.g., `id` or `name`)
+      const uniqueServices = Array.from(
+        new Set(response.data.map((service) => service.name)) // Use a unique property here
+      ).map((name) => response.data.find((service) => service.name === name));
+
+      setServiceData(uniqueServices); // Update state with deduplicated data
     } catch (error) {
-      console.log(error.response.data.error);
+      console.log(error.response?.data?.error || "Error fetching service data");
     } finally {
       setLoadingServiceData(false);
     }
