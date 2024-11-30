@@ -19,6 +19,11 @@ const GetNumber = () => {
   const [loadingBuyAgain, setLoadingBuyAgain] = useState({});
   const [popoverStates, setPopoverStates] = useState({});
 
+  useEffect(() => {
+    if (!user || !apiKey) {
+      router.push("/login");
+    }
+  }, [user, apiKey, router]);
   // Fetch orders and transactions
   const fetchOrdersAndTransactions = async () => {
     try {
@@ -177,8 +182,11 @@ const GetNumber = () => {
   };
 
   const handleBuyAgain = async (order) => {
-    console.log(serviceData);
-    console.log(order);
+    // Check if user exists, otherwise redirect to login
+    if (!user || !apiKey) {
+      router.push("/login");
+      return; // Stop further execution
+    }
 
     // Extract the service data for the corresponding order's service
     const service = serviceData.find((item) => item.name === order.service);

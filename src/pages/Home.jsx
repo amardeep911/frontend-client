@@ -28,6 +28,11 @@ const Home = ({ serviceData }) => {
   };
 
   const handleServerClick = async (serverNumber, serviceCode, isMultiple) => {
+    if (!user || !apiKey) {
+      navigate("/login"); // Redirect to login page
+      return; // Stop further execution
+    }
+
     if (loading) return;
 
     setLoading(true);
