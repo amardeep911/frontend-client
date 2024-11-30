@@ -25,10 +25,10 @@ const CheckOtp = () => {
       const response = await axios.get(
         `/check-otp?otp=${encodedotp}&api_key=${apiKey}`
       );
-
+      console.log(response.data);
       setOtp("");
-      setOtpText(response.data.results || []);
-      setNotFound(response.data.results.length === 0);
+      setOtpText(response.data || []);
+      setNotFound(response.data.length === 0);
     } catch (error) {
       setNotFound(true);
     } finally {
