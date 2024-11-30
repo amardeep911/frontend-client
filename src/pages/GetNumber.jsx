@@ -8,6 +8,8 @@ import toast from "react-hot-toast";
 import PopoverComponent from "@/components/shared/PopoverComponent";
 import { Icon } from "@/components/ui/Icons";
 
+import { useNavigate } from "react-router-dom";
+
 const GetNumber = () => {
   const [orders, setOrders] = useState([]);
   const [transactions, setTransactions] = useState([]);
@@ -17,13 +19,14 @@ const GetNumber = () => {
   const [otpError, setOtpError] = useState(false);
   const [loadingCancel, setLoadingCancel] = useState({});
   const [loadingBuyAgain, setLoadingBuyAgain] = useState({});
-  const [popoverStates, setPopoverStates] = useState({});
 
+  const [popoverStates, setPopoverStates] = useState({});
+  const navigate = useNavigate();
   useEffect(() => {
     if (!user || !apiKey) {
-      router.push("/login");
+      navigate("/login"); // Redirect to login page
     }
-  }, [user, apiKey, router]);
+  }, [user, apiKey]);
   // Fetch orders and transactions
   const fetchOrdersAndTransactions = async () => {
     try {
