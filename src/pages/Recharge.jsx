@@ -81,9 +81,6 @@ const Recharge = ({ maintenanceStatusTrx, maintenanceStatusUpi }) => {
     }
   };
 
-  console.log("Maintenance Status UPI:", maintenanceStatusUpi);
-  console.log("Maintenance Status TRX:", maintenanceStatusTrx);
-
   useEffect(() => {
     if (maintenanceStatusUpi) {
       setIsUpi(false);
