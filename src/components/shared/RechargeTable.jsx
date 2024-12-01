@@ -17,28 +17,36 @@ export const RechargeTable = ({ data, currentPage, limit }) => {
           </thead>
 
           <tbody>
-            {data.map((history, index) => (
-              <tr key={index} className="h-12 border-b border-[#373737]">
-                <td className="p-2 font-normal text-sm">
-                  {(currentPage - 1) * limit + index + 1}
-                </td>
-                <td className="p-2 font-normal text-sm">
-                  {history.transaction_id}
-                </td>
-                <td className="p-2 font-normal text-sm">{history.amount}</td>
-                <td className="p-2 font-normal text-sm">
-                  {history.payment_type}
-                </td>
-                <td className="p-2 font-normal text-sm">
-                  {moment(history.date_time, "MM/DD/YYYYThh:mm:ss A").format(
-                    "DD/MM/YYYY hh:mm:ss A"
-                  )}
-                </td>
-                <td className="p-2 font-normal text-sm text-teal-400">
-                  {history.status}
-                </td>
-              </tr>
-            ))}
+            {data.map(
+              (history, index) => (
+                console.log(history),
+                (
+                  <tr key={index} className="h-12 border-b border-[#373737]">
+                    <td className="p-2 font-normal text-sm">
+                      {(currentPage - 1) * limit + index + 1}
+                    </td>
+                    <td className="p-2 font-normal text-sm">
+                      {history.transaction_id}
+                    </td>
+                    <td className="p-2 font-normal text-sm">
+                      {history.amount}
+                    </td>
+                    <td className="p-2 font-normal text-sm">
+                      {history.payment_type}
+                    </td>
+                    <td className="p-2 font-normal text-sm">
+                      {moment(
+                        history.date_time,
+                        "MM/DD/YYYYThh:mm:ss A"
+                      ).format("DD/MM/YYYY hh:mm:ss A")}
+                    </td>
+                    <td className="p-2 font-normal text-sm text-teal-400">
+                      {history.status}
+                    </td>
+                  </tr>
+                )
+              )
+            )}
           </tbody>
         </table>
       </div>

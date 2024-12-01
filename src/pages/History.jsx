@@ -376,30 +376,35 @@ const NumberTable = ({ data, currentPage, limit }) => {
           </tr>
         </thead>
         <tbody>
-          {data.map((entry, index) => (
-            <tr key={index} className="h-12 border-b border-[#373737]">
-              <td className="p-2 font-normal text-sm">
-                {(currentPage - 1) * limit + index + 1}
-              </td>
-              <td className="p-2 font-normal text-sm">{entry.id}</td>
-              <td className="p-2 font-normal text-sm">{entry.number}</td>
-              <td
-                className="p-2 font-normal text-sm max-w-[400px]"
-                style={{ wordBreak: "break-word", whiteSpace: "normal" }}
-              >
-                <span dangerouslySetInnerHTML={{ __html: entry.otps }} />
-              </td>
-              <td className="p-2 font-normal text-sm">
-                {moment(entry.date_time).format("DD/MM/YYYY hh:mm:ss A")}
-              </td>
-              <td className="p-2 font-normal text-sm">{entry.service}</td>
-              <td className="p-2 font-normal text-sm">{entry.server}</td>
-              <td className="p-2 font-normal text-sm">{entry.price}</td>
-              <td className="p-2 font-normal text-sm text-teal-400">
-                {statusMap[entry.status] || entry.status}
-              </td>
-            </tr>
-          ))}
+          {data.map(
+            (entry, index) => (
+              console.log(entry),
+              (
+                <tr key={index} className="h-12 border-b border-[#373737]">
+                  <td className="p-2 font-normal text-sm">
+                    {(currentPage - 1) * limit + index + 1}
+                  </td>
+                  <td className="p-2 font-normal text-sm">{entry.id}</td>
+                  <td className="p-2 font-normal text-sm">{entry.number}</td>
+                  <td
+                    className="p-2 font-normal text-sm max-w-[400px]"
+                    style={{ wordBreak: "break-word", whiteSpace: "normal" }}
+                  >
+                    <span dangerouslySetInnerHTML={{ __html: entry.otps }} />
+                  </td>
+                  <td className="p-2 font-normal text-sm">
+                    {moment(entry.date_time).format("DD/MM/YYYY hh:mm:ss A")}
+                  </td>
+                  <td className="p-2 font-normal text-sm">{entry.service}</td>
+                  <td className="p-2 font-normal text-sm">{entry.server}</td>
+                  <td className="p-2 font-normal text-sm">{entry.price}</td>
+                  <td className="p-2 font-normal text-sm text-teal-400">
+                    {statusMap[entry.status] || entry.status}
+                  </td>
+                </tr>
+              )
+            )
+          )}
         </tbody>
       </table>
     </div>
