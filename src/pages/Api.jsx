@@ -64,7 +64,7 @@ const Api = () => {
     {
       name: "Get Number",
       id: "request_number",
-      link: "/get-number?api_key=${api_key}&servicecode=${service_code}&server=${server_number}",
+      link: "/get-number?api_key=${api_key}&code=${code}&server=${server_number}&otp=${otp}",
     },
     {
       name: "Get Otp",
