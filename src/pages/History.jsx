@@ -186,14 +186,18 @@ const History = () => {
 
   const filteredData = selectedTabs ? rechargeData : transactionData;
 
-  // Get date range
+  // Function to get date range
   const getDateRange = (data) => {
     if (data.length === 0) return "No data available";
-    const dates = data.map((entry) =>
-      moment(entry.date_time, "MM/DD/YYYYTHH:mm:ss A")
-    );
+
+    // Extract dates and parse them with Moment.js
+    const dates = data.map((entry) => moment(entry.date_time, moment.ISO_8601));
+
+    // Find the minimum and maximum dates
     const minDate = moment.min(dates);
     const maxDate = moment.max(dates);
+
+    // Format the date range
     return `${minDate.format("DD/MM/YY")} - ${maxDate.format("DD/MM/YY")}`;
   };
 

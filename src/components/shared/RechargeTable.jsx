@@ -35,10 +35,9 @@ export const RechargeTable = ({ data, currentPage, limit }) => {
                       {history.payment_type}
                     </td>
                     <td className="p-2 font-normal text-sm">
-                      {moment(
-                        history.date_time,
-                        "MM/DD/YYYYThh:mm:ss A"
-                      ).format("DD/MM/YYYY hh:mm:ss A")}
+                      {moment(history.date_time, "YYYY-MM-DDTHH:mm:ss").format(
+                        "DD/MM/YYYY hh:mm:ss A"
+                      )}
                     </td>
                     <td className="p-2 font-normal text-sm text-teal-400">
                       {history.status}
