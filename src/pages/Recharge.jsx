@@ -162,7 +162,7 @@ const Recharge = ({ maintenanceStatusTrx, maintenanceStatusUpi }) => {
       const rechargeRequest = async () => {
         try {
           const response = await axios.get(
-            `/recharge-trx-transaction?address=${user.trxAddress}&hash=${trxTransactionId.value}&userId=${user.userId}&exchangeRate=${exchangeRate}&email=${user.email}`
+            `/recharge-trx-transaction?address=${user.trxAddress}&hash=${trxTransactionId.value}&userId=${user.userId}&email=${user.email}`
           );
 
           resolve(response);
