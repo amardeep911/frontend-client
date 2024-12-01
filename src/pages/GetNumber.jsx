@@ -337,6 +337,11 @@ const GetNumber = () => {
                     <p>Price:</p>
                     <span> ₹{order.price}</span>
                   </div>
+                  <hr className="border-[#888888] border w-full" />
+                  <div className="w-full flex text-center items-center justify-between">
+                    <p>OTP Type:</p>
+                    <span> {order.numberType}</span>
+                  </div>
                 </div>
 
                 <div className="w-full flex border rounded-2xl items-center justify-center h-[45px]">
