@@ -35,7 +35,6 @@ const History = () => {
   const [tranFilter, setTranFilter] = useState("All");
 
   console.log(tranFilter);
-
   useEffect(() => {
     const fetchHistory = async () => {
       try {
@@ -44,9 +43,23 @@ const History = () => {
           axios.get(`/transaction-history?userId=${userId}`),
         ]);
 
-        setRechargeHistory(rechargeResponse.data || []); // Ensure it's an array
-        setTransactionHistory(transactionResponse.data || []); // Ensure it's an array
+        const sortedRechargeHistory = (rechargeResponse.data || []).sort(
+          (a, b) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+
+        const sortedTransactionHistory = (transactionResponse.data || []).sort(
+          (a, b) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+
+        console.log("Sorted Recharge History:", sortedRechargeHistory);
+        console.log("Sorted Transaction History:", sortedTransactionHistory);
+
+        setRechargeHistory(sortedRechargeHistory);
+        setTransactionHistory(sortedTransactionHistory);
       } catch (error) {
+        console.error("Error fetching data:", error);
         toast.error("Failed to fetch history data");
       }
     };
@@ -54,6 +67,10 @@ const History = () => {
     fetchHistory();
   }, [userId]);
 
+  useEffect(() => {
+    console.log("Updated Recharge History:", rechargeHistory);
+    console.log("Updated Transaction History:", transactionHistory);
+  }, [rechargeHistory, transactionHistory]);
   // Filter and group transaction history data
   const filterTransactionHistory = (data) => {
     if (!Array.isArray(data)) {
@@ -118,15 +135,7 @@ const History = () => {
   };
 
   // Sort transactions by date and time
-  const sortedFilteredTransactionHistory = filteredTransactionHistory
-    .sort((a, b) =>
-      moment(b.date_time, "MM/DD/YYYYTHH:mm:ss A").isBefore(
-        moment(a.date_time, "MM/DD/YYYYTHH:mm:ss A")
-      )
-        ? 1
-        : -1
-    )
-    .reverse();
+  const sortedFilteredTransactionHistory = filteredTransactionHistory;
 
   // Pagination handlers for Recharge History
   const handleRechargeLimitChange = (value) => {
@@ -171,18 +180,15 @@ const History = () => {
   const startIndexRecharge = (rechargeCurrentPage - 1) * rechargeLimit;
   const startIndexTransaction = (transactionCurrentPage - 1) * transactionLimit;
 
-  const rechargeData = Array.isArray(rechargeHistory)
-    ? rechargeHistory.slice(
-        startIndexRecharge,
-        startIndexRecharge + rechargeLimit
-      )
-    : [];
-  const transactionData = Array.isArray(sortedFilteredTransactionHistory)
-    ? sortedFilteredTransactionHistory.slice(
-        startIndexTransaction,
-        startIndexTransaction + transactionLimit
-      )
-    : [];
+  const rechargeData = rechargeHistory.slice(
+    startIndexRecharge,
+    startIndexRecharge + rechargeLimit
+  );
+
+  const transactionData = transactionHistory.slice(
+    startIndexTransaction,
+    startIndexTransaction + transactionLimit
+  );
 
   const filteredData = selectedTabs ? rechargeData : transactionData;
 
@@ -371,7 +377,6 @@ const NumberTable = ({ data, currentPage, limit }) => {
             <th className="p-2 font-normal">SL No’s</th>
             <th className="p-2 font-normal">ID</th>
             <th className="p-2 font-normal">Number</th>
-            <th className="p-2 font-normal">OTP</th>
             <th className="p-2 font-normal">Date & Time</th>
             <th className="p-2 font-normal">Service</th>
             <th className="p-2 font-normal">Server</th>
@@ -380,35 +385,24 @@ const NumberTable = ({ data, currentPage, limit }) => {
           </tr>
         </thead>
         <tbody>
-          {data.map(
-            (entry, index) => (
-              console.log(entry),
-              (
-                <tr key={index} className="h-12 border-b border-[#373737]">
-                  <td className="p-2 font-normal text-sm">
-                    {(currentPage - 1) * limit + index + 1}
-                  </td>
-                  <td className="p-2 font-normal text-sm">{entry.id}</td>
-                  <td className="p-2 font-normal text-sm">{entry.number}</td>
-                  <td
-                    className="p-2 font-normal text-sm max-w-[400px]"
-                    style={{ wordBreak: "break-word", whiteSpace: "normal" }}
-                  >
-                    <span dangerouslySetInnerHTML={{ __html: entry.otps }} />
-                  </td>
-                  <td className="p-2 font-normal text-sm">
-                    {moment(entry.date_time).format("DD/MM/YYYY hh:mm:ss A")}
-                  </td>
-                  <td className="p-2 font-normal text-sm">{entry.service}</td>
-                  <td className="p-2 font-normal text-sm">{entry.server}</td>
-                  <td className="p-2 font-normal text-sm">{entry.price}</td>
-                  <td className="p-2 font-normal text-sm text-teal-400">
-                    {statusMap[entry.status] || entry.status}
-                  </td>
-                </tr>
-              )
-            )
-          )}
+          {data.map((entry, index) => (
+            <tr key={index} className="h-12 border-b border-[#373737]">
+              <td className="p-2 font-normal text-sm">
+                {(currentPage - 1) * limit + index + 1}
+              </td>
+              <td className="p-2 font-normal text-sm">{entry.id}</td>
+              <td className="p-2 font-normal text-sm">{entry.number}</td>
+              <td className="p-2 font-normal text-sm">
+                {moment(entry.date_time).format("DD/MM/YYYY hh:mm:ss A")}
+              </td>
+              <td className="p-2 font-normal text-sm">{entry.service}</td>
+              <td className="p-2 font-normal text-sm">{entry.server}</td>
+              <td className="p-2 font-normal text-sm">{entry.price}</td>
+              <td className="p-2 font-normal text-sm text-teal-400">
+                {statusMap[entry.status] || entry.status}
+              </td>
+            </tr>
+          ))}
         </tbody>
       </table>
     </div>
