@@ -377,6 +377,7 @@ const NumberTable = ({ data, currentPage, limit }) => {
             <th className="p-2 font-normal">SL No’s</th>
             <th className="p-2 font-normal">ID</th>
             <th className="p-2 font-normal">Number</th>
+            <th className="p-2 font-normal">OTP</th>
             <th className="p-2 font-normal">Date & Time</th>
             <th className="p-2 font-normal">Service</th>
             <th className="p-2 font-normal">Server</th>
@@ -392,6 +393,20 @@ const NumberTable = ({ data, currentPage, limit }) => {
               </td>
               <td className="p-2 font-normal text-sm">{entry.id}</td>
               <td className="p-2 font-normal text-sm">{entry.number}</td>
+              <td
+                className="p-2 font-normal text-sm max-w-[400px]"
+                style={{ wordBreak: "break-word", whiteSpace: "normal" }}
+              >
+                {entry.otp && entry.otp.length > 0 ? (
+                  entry.otp.map((otp, idx) => (
+                    <div key={idx} className="text-sm mt-2">
+                      {otp}
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-sm">N/A</div>
+                )}
+              </td>
               <td className="p-2 font-normal text-sm">
                 {moment(entry.date_time).format("DD/MM/YYYY hh:mm:ss A")}
               </td>
@@ -408,7 +423,6 @@ const NumberTable = ({ data, currentPage, limit }) => {
     </div>
   );
 };
-
 const Limiter = ({ limit, onLimitChange }) => {
   return (
     <Select value={String(limit)} onValueChange={onLimitChange}>
