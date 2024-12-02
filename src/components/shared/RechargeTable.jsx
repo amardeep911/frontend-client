@@ -121,9 +121,9 @@ export const RechargeTabelMob = ({ data, currentPage, limit }) => {
                   className="border-b-2 border-[#949494] p-3"
                   style={wrapStyle}
                 >
-                  {moment(item.date_time, "MM/DD/YYYYThh:mm:ss A").format(
-                    "DD/MM/YYYY hh:mm:ss A"
-                  )}
+                  {moment(item.date_time, moment.ISO_8601, true).isValid()
+                    ? moment(item.date_time).format("DD/MM/YYYY hh:mm:ss A")
+                    : "Invalid Date"}
                 </td>
               </tr>
               <tr>
