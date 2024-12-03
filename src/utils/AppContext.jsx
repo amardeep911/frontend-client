@@ -12,6 +12,8 @@ export function AuthProvider({ children }) {
   const [serviceData, setServiceData] = useState([]); // Add serviceData state
   const [loadingServiceData, setLoadingServiceData] = useState(true); // Add loading state for service data
   const [isGoogleLogin, setIsGoogleLogin] = useState(false); // New state for Google login
+  const [minimumAmount, setMinimumAmount] = useState(50);
+  const [exchangeRate, setExchangeRate] = useState(null);
 
   const checkTokenExpiry = (token) => {
     try {
@@ -118,6 +120,26 @@ export function AuthProvider({ children }) {
     fetchServiceData(); // Fetch data for logged-out user
   };
 
+  const fetchMinimumRechargeAndExchangeRate = async () => {
+    try {
+      const [minRechargeResponse, exchangeRateResponse] = await Promise.all([
+        axios.get("/get-minimum-recharge"),
+        axios.get("/exchange-rate"),
+      ]);
+      setMinimumAmount(minRechargeResponse.data.minimumRecharge || 50);
+      setExchangeRate(exchangeRateResponse.data.price);
+    } catch (error) {
+      console.error("Error fetching initial data:", error);
+      setMinimumAmount(50); // Default value
+      setExchangeRate(0); // Default value
+    }
+  };
+
+  useEffect(() => {
+    // Fetch service data and minimum recharge for logged-out users on initial load
+    fetchServiceData();
+    fetchMinimumRechargeAndExchangeRate();
+  }, []);
   return (
     <AuthContext.Provider
       value={{
@@ -134,6 +156,8 @@ export function AuthProvider({ children }) {
         serviceData, // Provide service data to the context consumers
         loadingServiceData, // Provide loading state for service data
         isGoogleLogin, // Provide Google login state to context consumers
+        minimumAmount,
+        exchangeRate,
       }}
     >
       {children}
