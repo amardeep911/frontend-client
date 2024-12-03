@@ -59,15 +59,11 @@ const Recharge = ({ maintenanceStatusTrx, maintenanceStatusUpi }) => {
     }
     setTransactionOk(true);
 
-    // Fetch QR image only after validation passes
-    try {
-      const response = await axios.get(`/get-qr?amt=${amount.value}`);
-      const imageUrl = response.data.url;
-      setQRImage(imageUrl);
-    } catch (error) {
-      console.error("Error fetching QR code:", error);
-      toast.error("Failed to fetch QR code. Please try again.");
-    }
+    const response = await axios.get(`/get-qr?amt=${amount.value}`, {
+      responseType: "blob",
+    });
+    const imageUrl = URL.createObjectURL(response.data);
+    setQRImage(imageUrl);
   };
 
   const handleToggleTrx = () => {
