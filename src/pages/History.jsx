@@ -71,13 +71,14 @@ const History = () => {
     console.log("Updated Recharge History:", rechargeHistory);
     console.log("Updated Transaction History:", transactionHistory);
   }, [rechargeHistory, transactionHistory]);
-  // Filter and group transaction history data
+
+  const normalizeStatus = (status) => status?.toLowerCase() || "";
+
   const filterTransactionHistory = (data) => {
     if (!Array.isArray(data)) {
       return [];
     }
 
-    // Group data by `id` (transaction ID)
     const groupedData = data.reduce((acc, entry) => {
       if (!acc[entry.id]) {
         acc[entry.id] = [];
@@ -86,37 +87,35 @@ const History = () => {
       return acc;
     }, {});
 
-    // Prepare data for display
-    const preparedData = Object.values(groupedData).map((entries) => {
-      console.log(entries.map((entry) => entry.status));
-      // Find entries with specific statuses
+    return Object.values(groupedData).map((entries) => {
       const finishedEntries = entries.filter(
-        (entry) => entry.status === "SUCCESS"
+        (entry) => normalizeStatus(entry.status) === "success"
       );
       const cancelledEntries = entries.filter(
-        (entry) => entry.status === "CANCELLED"
+        (entry) => normalizeStatus(entry.status) === "cancelled"
       );
 
-      // Determine which entry to display
       const displayEntry =
         cancelledEntries.length > 0
           ? cancelledEntries[0]
-          : finishedEntries.find((entry) => entry.otp.length > 0) || entries[0]; // Use the first entry as fallback
+          : finishedEntries.find((entry) => entry.otp?.length > 0) ||
+            entries[0];
 
       return {
         ...displayEntry,
         otps:
-          displayEntry.otp.length > 0
-            ? displayEntry.otp.join("<br><br>") // Join OTPs with line breaks
-            : "-", // Display "-" if no OTPs are present
+          displayEntry.otp?.length > 0
+            ? displayEntry.otp.join("<br><br>")
+            : "-",
       };
     });
-
-    return preparedData;
   };
+  useEffect(() => {
+    console.log("Updated Transaction Filter:", tranFilter);
+  }, [tranFilter]);
 
-  // Apply filters for status
   let filteredTransactionHistory = filterTransactionHistory(transactionHistory);
+  console.log("Transaction History Before Filter:", filteredTransactionHistory);
 
   if (tranFilter === "Success") {
     filteredTransactionHistory = filteredTransactionHistory.filter(
@@ -127,12 +126,12 @@ const History = () => {
       (entry) => entry.status === "CANCELLED"
     );
   }
+  // Sort filtered data by date, from newest to oldest
+  filteredTransactionHistory.sort(
+    (a, b) => new Date(b.date_time).getTime() - new Date(a.date_time).getTime()
+  );
 
-  const statusMap = {
-    CANCELLED: "REFUNDED",
-    FINISHED: "FINISHED",
-    PENDING: "PENDING",
-  };
+  console.log("Filtered Transaction History:", filteredTransactionHistory);
 
   // Sort transactions by date and time
   const sortedFilteredTransactionHistory = filteredTransactionHistory;
@@ -185,7 +184,7 @@ const History = () => {
     startIndexRecharge + rechargeLimit
   );
 
-  const transactionData = transactionHistory.slice(
+  const transactionData = sortedFilteredTransactionHistory.slice(
     startIndexTransaction,
     startIndexTransaction + transactionLimit
   );
@@ -285,7 +284,7 @@ const History = () => {
                 No history available
               </div>
             )
-          ) : transactionHistory.length > 0 ? (
+          ) : sortedFilteredTransactionHistory.length > 0 ? (
             <>
               <div className="hidden md:block">
                 <NumberTable
@@ -361,7 +360,7 @@ const History = () => {
 };
 const statusMap = {
   CANCELLED: "REFUNDED",
-  SUCCESS: "SUCESS",
+  SUCCESS: "SUCCESS",
 };
 const wrapStyle = {
   wordBreak: "break-word",
