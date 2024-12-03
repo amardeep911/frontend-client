@@ -337,7 +337,7 @@ const GetNumber = () => {
                   </div>
                   <hr className="border-[#888888] border w-full" />
                   <div className="w-full flex text-center items-center justify-between">
-                    <p>OTP Type:</p>
+                    <p>Otp Type:</p>
                     <span> {order.numberType}</span>
                   </div>
                 </div>
