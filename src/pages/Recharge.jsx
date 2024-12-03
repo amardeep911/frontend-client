@@ -71,16 +71,6 @@ const Recharge = ({ maintenanceStatusTrx, maintenanceStatusUpi }) => {
     }
   };
 
-  const fetchQrImage = async () => {
-    try {
-      const response = await axios.get(`/get-qr?amt=${amount.value}`);
-      const imageUrl = response.data.url;
-      setQRImage(imageUrl);
-    } catch (error) {
-      console.error("Error fetching QR code:", error);
-    }
-  };
-
   useEffect(() => {
     if (maintenanceStatusUpi) {
       setIsUpi(false);
@@ -88,16 +78,25 @@ const Recharge = ({ maintenanceStatusTrx, maintenanceStatusUpi }) => {
   }, [maintenanceStatusUpi]);
 
   useEffect(() => {
-    fetchQrImage();
     fetchExchangeRate();
   }, [transactionOk, trxTransactionOk]);
 
-  const handleToggleUpi = () => {
+  const handleToggleUpi = async () => {
     if (!amount.value || amount.error) {
       toast.error("Please enter a valid amount.");
       return;
     }
     setTransactionOk(true);
+
+    // Fetch QR image only after validation passes
+    try {
+      const response = await axios.get(`/get-qr?amt=${amount.value}`);
+      const imageUrl = response.data.url;
+      setQRImage(imageUrl);
+    } catch (error) {
+      console.error("Error fetching QR code:", error);
+      toast.error("Failed to fetch QR code. Please try again.");
+    }
   };
 
   const handleToggleTrx = () => {
