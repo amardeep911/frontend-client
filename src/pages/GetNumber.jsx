@@ -151,7 +151,7 @@ const GetNumber = () => {
           } else {
             // Default cancel behavior
             await axios.get(
-              `/number-cancel?api_key=${apiKey}&id=${numberId}&server=${server}`
+              `/number-cancel?apikey=${apiKey}&id=${numberId}&server=${server}`
             );
           }
           resolve();
@@ -220,11 +220,7 @@ const GetNumber = () => {
       const buyAgainRequest = async () => {
         try {
           await axios.get(
-            `/get-number?api_key=${apiKey}&code=${serverDetails.code}&server=${
-              order.server
-            }&isMultiple=${isMultiple}&serverName=${encodeURIComponent(
-              service.name
-            )}`
+            `/get-number?apikey=${apiKey}&code=${serverDetails.code}&server=${order.server}&otp=${isMultiple}`
           );
 
           await fetchOrdersAndTransactions(); // Fetch updated orders
@@ -253,7 +249,7 @@ const GetNumber = () => {
         const { server, numberId } = order;
         // Fetch OTP for each order
         await axios.get(
-          `/get-otp?api_key=${apiKey}&server=${server}&id=${numberId}&serviceName=${order.service}`
+          `/get-otp?apikey=${apiKey}&server=${server}&id=${numberId}`
         );
       }
 
