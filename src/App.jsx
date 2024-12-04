@@ -33,6 +33,7 @@ function App() {
   const fetchMaintenance = async () => {
     const response = await axios.get("/maintainance-check");
     setMaintainance(response.data.maintainance);
+
     setIsMaintenance(response.data.maintainance);
   };
 
