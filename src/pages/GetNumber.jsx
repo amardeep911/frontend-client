@@ -178,12 +178,6 @@ const GetNumber = () => {
   };
 
   const handleBuyAgain = async (order) => {
-    // Check if user exists, otherwise redirect to login
-    if (!user || !apiKey) {
-      router.push("/login");
-      return; // Stop further execution
-    }
-
     // Extract the service data for the corresponding order's service
     const service = serviceData.find((item) => item.name === order.service);
 
@@ -217,7 +211,7 @@ const GetNumber = () => {
           await axios.get(
             `/get-number?apikey=${apiKey}&code=${serverDetails.code}&server=${
               order.server
-            }&otp=${isMultiple ? "multiple" : "single"}`
+            }&otptype=${isMultiple ? "multiple" : "single"}`
           );
 
           await fetchOrdersAndTransactions(); // Fetch updated orders
