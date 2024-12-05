@@ -139,7 +139,7 @@ const Home = ({ serviceData }) => {
                       disabled={loading}
                     >
                       <h3 className="capitalize font-medium flex flex-col items-start">
-                        Server {server.serverNumber}
+                        Server {server.server}
                         <span className="text-sm text-gray-400">
                           {server.otp}
                         </span>

@@ -64,22 +64,22 @@ const Api = () => {
     {
       name: "Get Number",
       id: "request_number",
-      link: "/get-number?api_key=${api_key}&code=${code}&server=${server_number}&otp=${otp}",
+      link: "/get-number?apikey=${api_key}&code=${code}&server=${server_number}&otptype=${otp}",
     },
     {
       name: "Get Otp",
       id: "activation_status",
-      link: "/get-otp?api_key=${api_key}&id=${id}&server=${server_number}",
+      link: "/get-otp?apikey=${api_key}&id=${id}&server=${server_number}",
     },
     {
       name: "Cancel Number",
       id: "get_activation_status",
-      link: "/number-cancel?api_key=${api_key}&id=${id}&server=${server_number}",
+      link: "/number-cancel?apikey=${api_key}&id=${id}&server=${server_number}",
     },
     {
       name: "Get Balance",
       id: "balance_request",
-      link: "/balance?api_key=${api_key}",
+      link: "/balance?apikey=${api_key}",
     },
     {
       name: "Service Code and Price",
