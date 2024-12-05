@@ -219,8 +219,8 @@ const GetNumber = () => {
         } catch (error) {
           reject(error);
         } finally {
-          await fetchBalance(apiKey); // Trigger balance update
           setLoadingBuyAgain((prev) => ({ ...prev, [order._id]: false }));
+          await fetchBalance(apiKey); // Trigger balance update
         }
       };
 
