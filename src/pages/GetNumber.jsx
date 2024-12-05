@@ -127,6 +127,7 @@ const GetNumber = () => {
     );
     await fetchBalance(apiKey);
   };
+
   const handleOrderCancel = async (
     orderId,
     numberId,
@@ -137,29 +138,33 @@ const GetNumber = () => {
     setLoadingCancel((prev) => ({ ...prev, [orderId]: true }));
 
     try {
+      let response;
       if (hasOtp) {
-        // Call `/api/cancel-order` when the button text is "Finish"
-        await axios.post(`/cancel-order?userId=${userId}&id=${numberId}`);
+        response = await axios.post(
+          `/cancel-order?userId=${userId}&id=${numberId}`
+        );
+        if (response.status === 200) {
+          toast.success("Order finished successfully!");
+        } else {
+          throw new Error("Failed to finish the order.");
+        }
       } else {
-        // Default cancel behavior
-        await axios.get(
+        response = await axios.get(
           `/number-cancel?apikey=${apiKey}&id=${numberId}&server=${server}`
         );
+
+        if (response.status === 200) {
+          toast.success("Number cancelled successfully!");
+        } else {
+          throw new Error("Failed to cancel the number.");
+        }
       }
 
-      // Only remove the order from the screen if the cancellation is successful
       setOrders((prevOrders) =>
         prevOrders.filter((order) => order._id !== orderId)
       );
 
-      // Optionally fetch the updated balance after successful cancellation
       await fetchBalance(apiKey);
-
-      toast.success(
-        hasOtp
-          ? "Order finished successfully!"
-          : "Number cancelled successfully!"
-      );
     } catch (error) {
       const errorMessage =
         error.response?.data?.error || "Error cancelling the Number!";
@@ -170,7 +175,6 @@ const GetNumber = () => {
   };
 
   const handleBuyAgain = async (order) => {
-    // Extract the service data for the corresponding order's service
     const service = serviceData.find((item) => item.name === order.service);
 
     if (!service) {
@@ -178,7 +182,6 @@ const GetNumber = () => {
       return;
     }
 
-    // Find the server details within the service's servers array
     const serverDetails = service.servers.find(
       (server) => server.server === order.server.toString()
     );
