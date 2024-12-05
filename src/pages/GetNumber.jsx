@@ -15,19 +15,14 @@ const GetNumber = () => {
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const { user, apiKey, fetchBalance, serviceData } = useContext(AuthContext);
+  const [contextLoading, setContextLoading] = useState(true);
   const [buttonStates, setButtonStates] = useState({});
   const [otpError, setOtpError] = useState(false);
   const [loadingCancel, setLoadingCancel] = useState({});
   const [loadingBuyAgain, setLoadingBuyAgain] = useState({});
 
   const [popoverStates, setPopoverStates] = useState({});
-  const navigate = useNavigate();
-  useEffect(() => {
-    if (!user || !apiKey) {
-      navigate("/login"); // Redirect to login page
-    }
-  }, [user, apiKey]);
-  // Fetch orders and transactions
+
   const fetchOrdersAndTransactions = async () => {
     try {
       const [ordersResponse, transactionsResponse] = await Promise.all([
