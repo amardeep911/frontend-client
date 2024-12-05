@@ -21,7 +21,7 @@ const About = lazy(() => import("@/pages/About"));
 const CheckOtp = lazy(() => import("@/pages/CheckOtp"));
 
 function App() {
-  axios.defaults.baseURL = "http://localhost:8000/api";
+  axios.defaults.baseURL = "https://paidsmsbackend.builderx100.com";
   axios.defaults.withCredentials = true;
   const { user, isGoogleLogin } = useContext(AuthContext);
 

@@ -12,8 +12,6 @@ export function AuthProvider({ children }) {
   const [serviceData, setServiceData] = useState([]); // Add serviceData state
   const [loadingServiceData, setLoadingServiceData] = useState(true); // Add loading state for service data
   const [isGoogleLogin, setIsGoogleLogin] = useState(false); // New state for Google login
-  const [minimumAmount, setMinimumAmount] = useState(50);
-  const [exchangeRate, setExchangeRate] = useState(null);
 
   const checkTokenExpiry = (token) => {
     try {
@@ -76,10 +74,6 @@ export function AuthProvider({ children }) {
   };
 
   useEffect(() => {
-    fetchServiceData(); // Fetch service data on component mount
-  }, []);
-
-  useEffect(() => {
     const fetchData = async () => {
       const token = localStorage.getItem("paidsms-token");
       if (token) {
@@ -96,6 +90,8 @@ export function AuthProvider({ children }) {
         setUser(null);
         setIsGoogleLogin(false); // Reset Google login state
       }
+
+      fetchServiceData(); // Fetch service data unconditionally after user state is set
     };
 
     fetchData();
