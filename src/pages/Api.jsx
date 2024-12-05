@@ -84,7 +84,7 @@ const Api = () => {
     {
       name: "Service Code and Price",
       id: "service_codes_prices",
-      link: "/get-service?api_key=${api_key}",
+      link: "/get-service?apikey=${api_key}",
     },
   ];
 
