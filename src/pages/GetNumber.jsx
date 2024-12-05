@@ -127,7 +127,6 @@ const GetNumber = () => {
     );
     await fetchBalance(apiKey);
   };
-
   const handleOrderCancel = async (
     orderId,
     numberId,
@@ -137,44 +136,37 @@ const GetNumber = () => {
   ) => {
     setLoadingCancel((prev) => ({ ...prev, [orderId]: true }));
 
-    const orderCancelPromise = new Promise((resolve, reject) => {
-      const orderCancelRequest = async () => {
-        try {
-          if (hasOtp) {
-            // Call `/api/cancel-order` when the button text is "Finish"
-            await axios.post(`/cancel-order?userId=${userId}&id=${numberId}`);
-          } else {
-            // Default cancel behavior
-            await axios.get(
-              `/number-cancel?apikey=${apiKey}&id=${numberId}&server=${server}`
-            );
-          }
-          resolve();
-        } catch (error) {
-          reject(error);
-        } finally {
-          // await fetchBalance(apiKey);
-          handleOrderExpire(orderId);
-          setLoadingCancel((prev) => ({ ...prev, [orderId]: false }));
-        }
-      };
+    try {
+      if (hasOtp) {
+        // Call `/api/cancel-order` when the button text is "Finish"
+        await axios.post(`/cancel-order?userId=${userId}&id=${numberId}`);
+      } else {
+        // Default cancel behavior
+        await axios.get(
+          `/number-cancel?apikey=${apiKey}&id=${numberId}&server=${server}`
+        );
+      }
 
-      orderCancelRequest();
-    });
+      // Only remove the order from the screen if the cancellation is successful
+      setOrders((prevOrders) =>
+        prevOrders.filter((order) => order._id !== orderId)
+      );
 
-    await toast.promise(orderCancelPromise, {
-      loading: hasOtp ? "Finishing Order..." : "Cancelling Number...",
-      success: () => {
-        return hasOtp
+      // Optionally fetch the updated balance after successful cancellation
+      await fetchBalance(apiKey);
+
+      toast.success(
+        hasOtp
           ? "Order finished successfully!"
-          : "Number cancelled successfully!";
-      },
-      error: (error) => {
-        const errorMessage =
-          error.response?.data?.error || "Error cancelling the Number!";
-        return errorMessage;
-      },
-    });
+          : "Number cancelled successfully!"
+      );
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.error || "Error cancelling the Number!";
+      toast.error(errorMessage);
+    } finally {
+      setLoadingCancel((prev) => ({ ...prev, [orderId]: false }));
+    }
   };
 
   const handleBuyAgain = async (order) => {
