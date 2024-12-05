@@ -40,7 +40,9 @@ const Home = ({ serviceData }) => {
     const getNumberPromise = new Promise((resolve, reject) => {
       const getNumberRequest = async () => {
         try {
-          const url = `/get-number?apikey=${apiKey}&code=${serviceCode}&server=${serverNumber}&otp=${isMultiple}`;
+          const url = `/get-number?apikey=${apiKey}&code=${serviceCode}&server=${serverNumber}&otptype=${
+            isMultiple ? "multiple" : "single"
+          }`;
           console.log("Request URL:", url);
 
           await axios.get(url); // API Call
