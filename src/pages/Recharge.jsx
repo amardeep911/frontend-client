@@ -5,6 +5,7 @@ import UpiIcon from "../assets/upi.svg?react";
 import { Label } from "@/components/ui/Label";
 import { Input } from "@/components/ui/Input";
 import { useContext, useState, useEffect } from "react";
+import { LayoutLoader } from "@/components/layout/Loaders";
 import { cn } from "@/lib/utils";
 
 import { useInputValidation } from "6pp";
@@ -33,10 +34,12 @@ const Recharge = ({ maintenanceStatusTrx, maintenanceStatusUpi }) => {
 
   const [trxTransactionOk, setTrxTransactionOk] = useState(false);
   const transactionId = useInputValidation("");
+  const [loading, setLoading] = useState(true);
 
   const [isloading, setIsloading] = useState(false);
-  const { user, fetchBalance, apiKey, minimumAmount, exchangeRate } =
-    useContext(AuthContext);
+  const { user, fetchBalance, apiKey } = useContext(AuthContext);
+  const [minimumAmount, setMinimumAmount] = useState(50);
+  const [exchangeRate, setExchangeRate] = useState(0);
   const [QRImage, setQRImage] = useState(null);
   const [confirmDialog, setConfirmDialog] = useState(true);
   const [open, setOpen] = useState(false);
@@ -51,6 +54,32 @@ const Recharge = ({ maintenanceStatusTrx, maintenanceStatusUpi }) => {
       setIsUpi(false);
     }
   }, [maintenanceStatusUpi]);
+
+  const fetchMinimumRechargeAndExchangeRate = async () => {
+    try {
+      setLoading(true); // Start loading
+      const [minRechargeResponse, exchangeRateResponse] = await Promise.all([
+        axios.get("/get-minimum-recharge"),
+        axios.get("/exchange-rate"),
+      ]);
+      setMinimumAmount(minRechargeResponse.data.minimumRecharge || 50);
+      setExchangeRate(exchangeRateResponse.data.price);
+    } catch (error) {
+      console.error("Error fetching initial data:", error);
+      setMinimumAmount(50); // Default value
+      setExchangeRate(0); // Default value
+    } finally {
+      setLoading(false); // Stop loading
+    }
+  };
+
+  useEffect(() => {
+    fetchMinimumRechargeAndExchangeRate();
+  }, []);
+
+  if (loading) {
+    return <LayoutLoader />; // Full-screen loader
+  }
 
   const handleToggleUpi = async () => {
     if (!amount.value || amount.error) {

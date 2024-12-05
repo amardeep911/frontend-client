@@ -36,7 +36,6 @@ export function AuthProvider({ children }) {
       const newApiKey = apiKeyResponse.data.api_key;
       setApiKey(newApiKey);
       fetchBalance(newApiKey);
-      fetchServiceData(userId); // Fetch service data after getting user ID
     } catch (error) {
       console.log("from here");
       console.log(error.response.data.error);
@@ -77,28 +76,29 @@ export function AuthProvider({ children }) {
   };
 
   useEffect(() => {
-    // Fetch service data for logged-out users on initial load
-    fetchServiceData();
+    fetchServiceData(); // Fetch service data on component mount
   }, []);
 
   useEffect(() => {
-    const token = localStorage.getItem("paidsms-token");
-    if (token) {
-      const user = checkTokenExpiry(token);
-      if (user) {
-        setUser(user);
-        setIsGoogleLogin(user.logintype === "google"); // Update Google login state
-        fetchUserData(user.userId);
+    const fetchData = async () => {
+      const token = localStorage.getItem("paidsms-token");
+      if (token) {
+        const user = checkTokenExpiry(token);
+        if (user) {
+          setUser(user);
+          setIsGoogleLogin(user.logintype === "google"); // Update Google login state
+          await fetchUserData(user.userId); // Fetch data for logged-in user
+        } else {
+          setUser(null);
+          setIsGoogleLogin(false); // Reset Google login state
+        }
       } else {
         setUser(null);
         setIsGoogleLogin(false); // Reset Google login state
-        fetchServiceData();
       }
-    } else {
-      setUser(null);
-      setIsGoogleLogin(false); // Reset Google login state
-      fetchServiceData();
-    }
+    };
+
+    fetchData();
   }, []);
 
   const login = (token) => {
@@ -120,26 +120,6 @@ export function AuthProvider({ children }) {
     fetchServiceData(); // Fetch data for logged-out user
   };
 
-  const fetchMinimumRechargeAndExchangeRate = async () => {
-    try {
-      const [minRechargeResponse, exchangeRateResponse] = await Promise.all([
-        axios.get("/get-minimum-recharge"),
-        axios.get("/exchange-rate"),
-      ]);
-      setMinimumAmount(minRechargeResponse.data.minimumRecharge || 50);
-      setExchangeRate(exchangeRateResponse.data.price);
-    } catch (error) {
-      console.error("Error fetching initial data:", error);
-      setMinimumAmount(50); // Default value
-      setExchangeRate(0); // Default value
-    }
-  };
-
-  useEffect(() => {
-    // Fetch service data and minimum recharge for logged-out users on initial load
-    fetchServiceData();
-    fetchMinimumRechargeAndExchangeRate();
-  }, []);
   return (
     <AuthContext.Provider
       value={{
@@ -156,8 +136,6 @@ export function AuthProvider({ children }) {
         serviceData, // Provide service data to the context consumers
         loadingServiceData, // Provide loading state for service data
         isGoogleLogin, // Provide Google login state to context consumers
-        minimumAmount,
-        exchangeRate,
       }}
     >
       {children}
