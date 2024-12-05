@@ -215,7 +215,9 @@ const GetNumber = () => {
       const buyAgainRequest = async () => {
         try {
           await axios.get(
-            `/get-number?apikey=${apiKey}&code=${serverDetails.code}&server=${order.server}&otp=${isMultiple}`
+            `/get-number?apikey=${apiKey}&code=${serverDetails.code}&server=${
+              order.server
+            }&otp=${isMultiple ? "multiple" : "single"}`
           );
 
           await fetchOrdersAndTransactions(); // Fetch updated orders
