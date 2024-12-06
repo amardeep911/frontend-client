@@ -16,7 +16,7 @@ app.get("/api/service-data", async (req, res) => {
 
     // Fetch data from the external API
     const response = await axios.get(
-      `https://own5k.in/p/final.php${userId ? `?userId=${userId}` : ""}`
+      `https://php.paidsms.in/final.php${userId ? `?userId=${userId}` : ""}`
     );
 
     // Send the response data back to the client
