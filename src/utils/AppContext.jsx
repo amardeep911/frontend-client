@@ -42,7 +42,7 @@ export function AuthProvider({ children }) {
 
   const fetchBalance = async (apiKey) => {
     try {
-      const balanceResponse = await axios.get(`/balance?api_key=${apiKey}`);
+      const balanceResponse = await axios.get(`/balance?apikey=${apiKey}`);
       setBalance(balanceResponse.data.balance);
     } catch (error) {
       console.log(error.response.data.error);
