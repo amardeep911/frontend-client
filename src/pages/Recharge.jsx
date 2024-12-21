@@ -77,9 +77,9 @@ const Recharge = ({ maintenanceStatusTrx, maintenanceStatusUpi }) => {
     fetchMinimumRechargeAndExchangeRate();
   }, []);
 
-  if (loading) {
-    return <LayoutLoader />; // Full-screen loader
-  }
+  // if (loading) {
+  //   return <LayoutLoader />; // Full-screen loader
+  // }
 
   const handleToggleUpi = async () => {
     if (!amount.value || amount.error) {
