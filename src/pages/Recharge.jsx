@@ -43,43 +43,64 @@ const Recharge = ({ maintenanceStatusTrx, maintenanceStatusUpi }) => {
   const [QRImage, setQRImage] = useState(null);
   const [confirmDialog, setConfirmDialog] = useState(true);
   const [open, setOpen] = useState(false);
+
   console.log("User:", user);
 
   const amount = useInputValidation("", (value) =>
     amountValidator(value, minimumAmount)
   );
 
-  useEffect(() => {
-    if (maintenanceStatusUpi) {
-      setIsUpi(false);
-    }
-  }, [maintenanceStatusUpi]);
+  // useEffect(() => {
+  //   if (maintenanceStatusUpi) {
+  //     setIsUpi(false);
+  //   }
+  // }, [maintenanceStatusUpi]);
+  // console.log(maintenanceStatusTrx);
+  console.log(maintenanceStatusTrx);
 
-  const fetchMinimumRechargeAndExchangeRate = async () => {
+  const fetchMinimumRecharge = async () => {
     try {
-      setLoading(true); // Start loading
-      const [minRechargeResponse, exchangeRateResponse] = await Promise.all([
-        axios.get("/get-minimum-recharge"),
-        axios.get("/exchange-rate"),
-      ]);
+      const minRechargeResponse = await axios.get("/get-minimum-recharge");
       setMinimumAmount(minRechargeResponse.data.minimumRecharge || 50);
+    } catch (error) {
+      console.error("Error fetching minimum recharge:", error);
+      setMinimumAmount(50); // Default value
+    }
+  };
+
+  const fetchExchangeRate = async () => {
+    try {
+      const exchangeRateResponse = await axios.get("/exchange-rate");
       setExchangeRate(exchangeRateResponse.data.price);
     } catch (error) {
-      console.error("Error fetching initial data:", error);
-      setMinimumAmount(50); // Default value
+      console.error("Error fetching exchange rate:", error);
       setExchangeRate(0); // Default value
-    } finally {
-      setLoading(false); // Stop loading
     }
   };
 
   useEffect(() => {
-    fetchMinimumRechargeAndExchangeRate();
-  }, []);
+    const fetchData = async () => {
+      setLoading(true);
 
-  // if (loading) {
-  //   return <LayoutLoader />; // Full-screen loader
-  // }
+      // Always fetch minimum recharge
+      await fetchMinimumRecharge();
+
+      // Fetch exchange rate only if TRX is not under maintenance
+      if (!maintenanceStatusTrx) {
+        await fetchExchangeRate();
+      } else {
+        setExchangeRate(0); // Reset exchange rate if TRX is under maintenance
+      }
+
+      setLoading(false);
+    };
+
+    fetchData();
+  }, [maintenanceStatusTrx]);
+
+  if (loading) {
+    return <LayoutLoader />; // Full-screen loader
+  }
 
   const handleToggleUpi = async () => {
     if (!amount.value || amount.error) {
