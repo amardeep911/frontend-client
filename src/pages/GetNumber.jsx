@@ -193,40 +193,28 @@ const GetNumber = () => {
       return;
     }
 
-    // Determine if the order should have isMultiple set to true or false
     const isMultiple = serverDetails.otp === "Multiple Otp";
 
-    console.log(`isMultiple: ${isMultiple}`);
-
-    // Proceed with the buy again process
     setLoadingBuyAgain((prev) => ({ ...prev, [order._id]: true }));
-    const buyAgainPromise = new Promise((resolve, reject) => {
-      const buyAgainRequest = async () => {
-        try {
-          await axios.get(
-            `/get-number?apikey=${apiKey}&code=${serverDetails.code}&server=${
-              order.server
-            }&otptype=${isMultiple ? "multiple" : "single"}`
-          );
 
-          await fetchOrdersAndTransactions(); // Fetch updated orders
-          resolve();
-        } catch (error) {
-          reject(error);
-        } finally {
-          setLoadingBuyAgain((prev) => ({ ...prev, [order._id]: false }));
-          await fetchBalance(apiKey); // Trigger balance update
-        }
-      };
+    try {
+      await axios.get(
+        `/get-number?apikey=${apiKey}&code=${serverDetails.code}&server=${
+          order.server
+        }&otptype=${isMultiple ? "multiple" : "single"}`
+      );
 
-      buyAgainRequest();
-    });
-
-    await toast.promise(buyAgainPromise, {
-      loading: "Buying Again...",
-      success: "Number bought again successfully!",
-      error: "Error buying the number again. Please try again.",
-    });
+      await fetchOrdersAndTransactions(); // Fetch updated orders
+      toast.success("Number bought again successfully!");
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.error ||
+        "Error buying the number again. Please try again.";
+      toast.error(errorMessage);
+    } finally {
+      setLoadingBuyAgain((prev) => ({ ...prev, [order._id]: false }));
+      await fetchBalance(apiKey); // Trigger balance update
+    }
   };
 
   const handleGetOtp = async (orders) => {
