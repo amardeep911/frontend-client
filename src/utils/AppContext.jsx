@@ -82,6 +82,7 @@ export function AuthProvider({ children }) {
           setUser(user);
           setIsGoogleLogin(user.logintype === "google"); // Update Google login state
           await fetchUserData(user.userId); // Fetch data for logged-in user
+          await fetchServiceData(user.userId);
         } else {
           setUser(null);
           setIsGoogleLogin(false); // Reset Google login state
@@ -90,8 +91,6 @@ export function AuthProvider({ children }) {
         setUser(null);
         setIsGoogleLogin(false); // Reset Google login state
       }
-
-      fetchServiceData(); // Fetch service data unconditionally after user state is set
     };
 
     fetchData();
