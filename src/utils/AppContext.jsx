@@ -49,10 +49,10 @@ export function AuthProvider({ children }) {
     }
   };
 
-  const fetchServiceData = async (userId) => {
+  const fetchServiceData = async (userId = null) => {
     try {
       setLoadingServiceData(true);
-
+      console.log(userId);
       const response = await axios.get(
         `/get-service-data${userId ? `?userId=${userId}` : ""}`,
         {
@@ -60,12 +60,11 @@ export function AuthProvider({ children }) {
         }
       );
 
-      // Deduplicate the service data based on a unique property (e.g., `id` or `name`)
       const uniqueServices = Array.from(
-        new Set(response.data.map((service) => service.name)) // Use a unique property here
+        new Set(response.data.map((service) => service.name))
       ).map((name) => response.data.find((service) => service.name === name));
 
-      setServiceData(uniqueServices); // Update state with deduplicated data
+      setServiceData(uniqueServices);
     } catch (error) {
       console.log(error.response?.data?.error || "Error fetching service data");
     } finally {
@@ -77,24 +76,32 @@ export function AuthProvider({ children }) {
     const fetchData = async () => {
       const token = localStorage.getItem("paidsms-token");
       if (token) {
-        const user = checkTokenExpiry(token);
-        if (user) {
-          setUser(user);
-          setIsGoogleLogin(user.logintype === "google"); // Update Google login state
-          await fetchUserData(user.userId); // Fetch data for logged-in user
-          await fetchServiceData(user.userId);
+        const decodedUser = checkTokenExpiry(token);
+        if (decodedUser) {
+          setUser(decodedUser);
+          setIsGoogleLogin(decodedUser.logintype === "google");
+          await fetchUserData(decodedUser.userId);
+          await fetchServiceData(decodedUser.userId); // Fetch service data after setting the user
         } else {
           setUser(null);
-          setIsGoogleLogin(false); // Reset Google login state
+          setIsGoogleLogin(false);
         }
       } else {
         setUser(null);
-        setIsGoogleLogin(false); // Reset Google login state
+        setIsGoogleLogin(false);
       }
     };
 
     fetchData();
   }, []);
+
+  useEffect(() => {
+    if (user) {
+      fetchServiceData(user.userId);
+    } else {
+      fetchServiceData(null);
+    }
+  }, [user]);
 
   const login = (token) => {
     const user = checkTokenExpiry(token);
@@ -112,7 +119,7 @@ export function AuthProvider({ children }) {
     setApiKey(null);
     setBalance(null);
     setIsGoogleLogin(false); // Reset Google login state
-    fetchServiceData(); // Fetch data for logged-out user
+    fetchServiceData(null);
   };
 
   return (
