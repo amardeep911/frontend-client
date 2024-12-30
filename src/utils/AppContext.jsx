@@ -35,7 +35,6 @@ export function AuthProvider({ children }) {
       setApiKey(newApiKey);
       fetchBalance(newApiKey);
     } catch (error) {
-      console.log("from here");
       console.log(error.response.data.error);
     }
   };
@@ -52,7 +51,7 @@ export function AuthProvider({ children }) {
   const fetchServiceData = async (userId = null) => {
     try {
       setLoadingServiceData(true);
-      console.log(userId);
+
       const response = await axios.get(
         `/get-service-data${userId ? `?userId=${userId}` : ""}`,
         {
